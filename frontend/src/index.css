@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+/*
+  RideNow AI design tokens.
+  Source: docs/DESIGN_REFERENCE.md (dark theme, from shared reference mockups).
+  These become Tailwind utilities automatically, e.g. bg-bg-page, text-accent-teal,
+  border-border-default, bg-danger-DEFAULT, etc.
+*/
+@theme {
+  --color-bg-page: #0b1329;
+  --color-bg-card: #0f172a;
+  --color-bg-card-alt: #1e293b;
+  --color-border-default: #334155;
+
+  --color-accent-teal: #14b8a6;
+  --color-accent-teal-dark: #0d9488;
+  --color-accent-teal-light: #2dd4bf;
+
+  --color-success-DEFAULT: #34d399;
+  --color-success-light: #4ade80;
+  --color-success-dark: #059669;
+
+  --color-info-DEFAULT: #38bdf8;
+
+  --color-warning-DEFAULT: #f59e0b;
+
+  --color-danger-DEFAULT: #ef4444;
+  --color-danger-dark: #dc2626;
+  --color-danger-darker: #991b1b;
+
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #94a3b8;
+
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bg-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100svh;
+}
