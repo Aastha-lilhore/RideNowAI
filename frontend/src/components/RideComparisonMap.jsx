@@ -1,11 +1,10 @@
 import { useState } from 'react'
 
 /**
- * Premium, minimal ride-comparison visualization — replaces the earlier
- * generic "AI graphic" per the redesign brief. Shows pickup, destination,
- * a few route options, and one AI-recommended route. Data is mocked but
- * the selection is real: clicking a route updates the Ride Score panel,
- * so the visual isn't just static decoration.
+ * Ride-comparison visualization, Midnight Amber palette. The recommended
+ * route uses a single-hue amber depth gradient (light -> dark copper) for
+ * dimensionality without turning into a multi-color "AI gradient" cliché.
+ * Selection is real: clicking a route updates the Ride Score panel.
  */
 const ROUTES = [
   { id: 'r1', d: 'M64 320 C 120 300, 150 220, 210 200 S 320 140, 380 70', fare: 184, time: 18, score: 92, recommended: true },
@@ -25,8 +24,15 @@ function RideComparisonMap() {
         role="img"
         aria-label="Map comparing ride routes by fare, time and safety score"
       >
+        <defs>
+          <linearGradient id="routeGradient" x1="64" y1="320" x2="380" y2="70" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#f0a94e" />
+            <stop offset="100%" stopColor="#b3661a" />
+          </linearGradient>
+        </defs>
+
         {/* subtle street grid, not a literal map */}
-        <g stroke="#1e293b" strokeWidth="1">
+        <g stroke="#221f1b" strokeWidth="1">
           <path d="M0 90 H440" />
           <path d="M0 190 H440" />
           <path d="M0 290 H440" />
@@ -41,7 +47,7 @@ function RideComparisonMap() {
             key={route.id}
             d={route.d}
             fill="none"
-            stroke="#475569"
+            stroke="#4a443c"
             strokeWidth="2"
             strokeLinecap="round"
             className="cursor-pointer transition-colors hover:stroke-text-secondary"
@@ -53,18 +59,18 @@ function RideComparisonMap() {
         <path
           d={selected.d}
           fill="none"
-          stroke="#14b8a6"
-          strokeWidth="3"
+          stroke="url(#routeGradient)"
+          strokeWidth="3.5"
           strokeLinecap="round"
-          className="cursor-pointer drop-shadow-[0_0_6px_rgba(20,184,166,0.55)]"
+          className="cursor-pointer drop-shadow-[0_0_7px_rgba(217,130,43,0.5)]"
           onClick={() => setSelectedId(selected.id)}
         />
 
         {/* pickup marker */}
-        <circle cx="64" cy="320" r="6" fill="#0b1329" stroke="#94a3b8" strokeWidth="2" />
+        <circle cx="64" cy="320" r="6" fill="#0a0a0b" stroke="#a39a8f" strokeWidth="2" />
         {/* destination marker */}
-        <circle cx="380" cy="70" r="6" fill="#14b8a6" />
-        <circle cx="380" cy="70" r="11" fill="#14b8a6" opacity="0.2" />
+        <circle cx="380" cy="70" r="6" fill="#f0a94e" />
+        <circle cx="380" cy="70" r="11" fill="#d9822b" opacity="0.2" />
       </svg>
 
       <div className="mt-1 flex items-center justify-between border-t border-border-default pt-4">
@@ -72,8 +78,8 @@ function RideComparisonMap() {
           <p className="text-xs text-text-secondary">
             {selected.recommended ? 'Recommended route' : 'Selected route'}
           </p>
-          <p className="mt-1 text-2xl font-semibold text-text-primary">
-            {selected.score}
+          <p className="mt-1 font-display text-2xl font-semibold">
+            <span className="text-accent-amber-light">{selected.score}</span>
             <span className="text-sm font-normal text-text-secondary"> Ride Score</span>
           </p>
         </div>

@@ -16,8 +16,8 @@ function MarketingNav() {
     <header className="sticky top-0 z-20 border-b border-border-default/70 bg-bg-page/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <a href="#top" className="flex items-center gap-2">
-          <span className="h-1.5 w-1.5 rounded-full bg-accent-teal" />
-          <span className="text-[15px] font-semibold tracking-tight text-text-primary">
+          <span className="h-1.5 w-1.5 rounded-full bg-accent-amber" />
+          <span className="font-display text-[15px] font-semibold tracking-tight text-text-primary">
             RideNow <span className="text-text-secondary font-normal">AI</span>
           </span>
         </a>

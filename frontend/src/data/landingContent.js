@@ -12,6 +12,7 @@ export const NAV_LINKS = [
 
 export const HERO = {
   eyebrow: 'Ride comparison, simplified',
-  headline: 'Smarter rides. Better decisions.',
+  headline: 'Smarter rides.',
+  headlineAccent: 'Better decisions.',
   subheadline: 'Compare rides by fare, time and safety before you book.',
 }

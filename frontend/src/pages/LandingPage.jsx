@@ -20,14 +20,15 @@ function LandingPage() {
         className="bg-hero-glow mx-auto flex max-w-6xl flex-col-reverse items-center gap-12 px-6 py-16 md:flex-row md:items-center md:gap-16 md:py-28"
       >
         <div className="flex-1 text-center md:text-left">
-          <span className="animate-fade-in-up block text-xs font-medium tracking-wide text-text-secondary">
+          <span className="animate-fade-in-up inline-flex items-center gap-2 rounded-full border border-border-default bg-bg-card px-3 py-1 text-xs font-medium tracking-wide text-text-secondary">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent-amber" />
             {HERO.eyebrow}
           </span>
           <h1
-            className="animate-fade-in-up mt-4 text-3xl font-semibold leading-tight text-text-primary md:text-4xl"
+            className="animate-fade-in-up mt-4 font-display text-3xl font-semibold leading-tight text-text-primary md:text-4xl"
             style={{ animationDelay: '80ms' }}
           >
-            {HERO.headline}
+            {HERO.headline} <span className="text-accent-highlight">{HERO.headlineAccent}</span>
           </h1>
           <p
             className="animate-fade-in-up mx-auto mt-3 max-w-sm text-base text-text-secondary md:mx-0"
