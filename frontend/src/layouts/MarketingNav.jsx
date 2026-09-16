@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Menu, X } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import { NAV_LINKS } from '../data/landingContent.js'
@@ -35,13 +36,15 @@ function MarketingNav() {
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
-          <a
-            href="#login"
+          <Link
+            to="/auth?tab=login"
             className="text-sm text-text-secondary transition-colors hover:text-text-primary"
           >
             Log in
-          </a>
-          <Button className="px-4 py-2">Get Started</Button>
+          </Link>
+          <Button to="/auth?tab=signup" className="px-4 py-2">
+            Get Started
+          </Button>
         </div>
 
         <button
@@ -68,15 +71,17 @@ function MarketingNav() {
                 {link.label}
               </a>
             ))}
-            <a
-              href="#login"
+            <Link
+              to="/auth?tab=login"
               className="rounded-md px-2 py-2.5 text-sm text-text-secondary hover:text-text-primary"
               onClick={() => setOpen(false)}
             >
               Log in
-            </a>
+            </Link>
           </nav>
-          <Button className="mt-3 w-full">Get Started</Button>
+          <Button to="/auth?tab=signup" className="mt-3 w-full" onClick={() => setOpen(false)}>
+            Get Started
+          </Button>
         </div>
       )}
     </header>

@@ -1,5 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import LandingPage from '../pages/LandingPage.jsx'
+import AuthPage from '../pages/AuthPage.jsx'
+import DashboardPage from '../pages/DashboardPage.jsx'
 
 /**
  * Central route table for RideNow AI.
@@ -11,6 +13,8 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/dashboard" element={<DashboardPage />} />
     </Routes>
   )
 }

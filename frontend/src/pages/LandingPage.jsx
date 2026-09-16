@@ -41,8 +41,10 @@ function LandingPage() {
             className="animate-fade-in-up mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center md:justify-start"
             style={{ animationDelay: '240ms' }}
           >
-            <Button>Find a Ride</Button>
-            <Button variant="secondary">Compare Rides</Button>
+            <Button to="/auth?tab=signup">Find a Ride</Button>
+            <Button variant="secondary" to="/auth?tab=signup">
+              Compare Rides
+            </Button>
           </div>
         </div>
 
