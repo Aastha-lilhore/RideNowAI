@@ -17,7 +17,7 @@ function LandingPage() {
 
       <section
         id="find-a-ride"
-        className="mx-auto flex max-w-6xl flex-col-reverse items-center gap-12 px-6 py-16 md:flex-row md:items-center md:gap-16 md:py-28"
+        className="bg-hero-glow mx-auto flex max-w-6xl flex-col-reverse items-center gap-12 px-6 py-16 md:flex-row md:items-center md:gap-16 md:py-28"
       >
         <div className="flex-1 text-center md:text-left">
           <span className="animate-fade-in-up inline-flex items-center gap-2 rounded-full border border-border-default bg-bg-card px-3 py-1 text-xs font-medium tracking-wide text-text-secondary">
