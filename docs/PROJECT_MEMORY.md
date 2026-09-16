@@ -79,7 +79,11 @@ CANCELLED
 AI recommendations should be explainable, not merely labeled "AI".
 
 ## Current Phase
-Step 0 — Project documentation and frontend rules established.
+Screens 1–3 built: Landing, Auth (Login/Signup), Home Dashboard. Screen 4
+(Ride Search) has a placeholder confirming the pickup/destination handoff
+works; Activity, Safety and Insights tabs are placeholders in the
+persistent nav shell.
 
 ## Next Step
-Inspect the existing GitHub repository and existing frontend setup before making UI changes.
+Build the real Ride Search screen: priority selection (Cheapest / Fastest
+/ Safest / AI Recommended per REQUIREMENTS.md), then AI Ride Results.
