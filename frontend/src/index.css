@@ -40,33 +40,93 @@ body {
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  position: relative;
-}
-
-/*
-  Page-wide film-grain texture — applied once here so every screen shares
-  it, not just the hero. Deliberately replacing the grid-lines + glowing
-  blob pattern (the single most overused "AI-generated landing page"
-  background) with something that reads as considered rather than
-  templated: a fixed, very low-opacity noise layer via SVG feTurbulence,
-  blended with the base color rather than sitting on top of it.
-*/
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
 }
 
 #root {
-  position: relative;
-  z-index: 1;
   min-height: 100svh;
+}
+
+/*
+  Illustrated night-city hero scene animations (see NightCityScene.jsx):
+  a slow Ken Burns zoom on the whole scene, twinkling stars/windows, and
+  one headlight sweeping across the road on a loop.
+*/
+.scene-zoom {
+  animation: scene-zoom 26s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+@keyframes scene-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+.twinkle {
+  animation: twinkle 3.4s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.headlight-pass {
+  animation: headlight-pass 7s linear infinite;
+}
+
+@keyframes headlight-pass {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(1460px);
+  }
+}
+
+/* RideBuddy patrols back and forth along the dashboard banner's road */
+.ridebuddy-patrol {
+  animation: ridebuddy-patrol 10s linear infinite;
+}
+
+@keyframes ridebuddy-patrol {
+  0% {
+    left: 6%;
+    transform: scaleX(1);
+  }
+  48% {
+    left: 80%;
+    transform: scaleX(1);
+  }
+  50% {
+    left: 80%;
+    transform: scaleX(-1);
+  }
+  98% {
+    left: 6%;
+    transform: scaleX(-1);
+  }
+  100% {
+    left: 6%;
+    transform: scaleX(1);
+  }
+}
+.route-flow {
+  stroke-dasharray: 10 8;
+  animation: route-flow 1.1s linear infinite;
+}
+
+@keyframes route-flow {
+  to {
+    stroke-dashoffset: -18;
+  }
 }
 
 /*
@@ -119,7 +179,12 @@ body::before {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
-  .text-accent-highlight::after {
+  .text-accent-highlight::after,
+  .scene-zoom,
+  .twinkle,
+  .headlight-pass,
+  .route-flow,
+  .ridebuddy-patrol {
     animation: none;
     transform: none;
   }

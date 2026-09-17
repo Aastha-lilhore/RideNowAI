@@ -14,5 +14,5 @@ export const HERO = {
   eyebrow: 'Ride comparison, simplified',
   headline: 'Smarter rides.',
   headlineAccent: 'Better decisions.',
-  subheadline: 'Compare rides by fare, time and safety before you book.',
+  subheadline: 'Fare, time and safety — compared instantly, every time you ride.',
 }

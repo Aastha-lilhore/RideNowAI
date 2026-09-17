@@ -65,6 +65,16 @@ function RideComparisonMap() {
           className="cursor-pointer drop-shadow-[0_0_7px_rgba(217,130,43,0.5)]"
           onClick={() => setSelectedId(selected.id)}
         />
+        {/* animated flowing dashes on top, suggesting live movement */}
+        <path
+          d={selected.d}
+          fill="none"
+          stroke="#ffe3b8"
+          strokeOpacity="0.8"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          className="route-flow pointer-events-none"
+        />
 
         {/* pickup marker */}
         <circle cx="64" cy="320" r="6" fill="#0a0a0b" stroke="#a39a8f" strokeWidth="2" />

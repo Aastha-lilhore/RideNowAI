@@ -4,6 +4,8 @@ import AuthPage from '../pages/AuthPage.jsx'
 import AppShell from '../layouts/AppShell.jsx'
 import DashboardPage from '../pages/DashboardPage.jsx'
 import SearchPage from '../pages/SearchPage.jsx'
+import ResultsPage from '../pages/ResultsPage.jsx'
+import RideDetailsPage from '../pages/RideDetailsPage.jsx'
 import ActivityPage from '../pages/ActivityPage.jsx'
 import SafetyPage from '../pages/SafetyPage.jsx'
 import InsightsPage from '../pages/InsightsPage.jsx'
@@ -23,6 +25,8 @@ function AppRoutes() {
       <Route element={<AppShell />}>
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/results" element={<ResultsPage />} />
+        <Route path="/ride-details" element={<RideDetailsPage />} />
         <Route path="/activity" element={<ActivityPage />} />
         <Route path="/safety" element={<SafetyPage />} />
         <Route path="/insights" element={<InsightsPage />} />

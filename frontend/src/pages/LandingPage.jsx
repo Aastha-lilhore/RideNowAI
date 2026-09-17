@@ -1,14 +1,14 @@
 import MarketingNav from '../layouts/MarketingNav.jsx'
 import Button from '../components/Button.jsx'
 import RideComparisonMap from '../components/RideComparisonMap.jsx'
+import NightCityScene from '../components/NightCityScene.jsx'
 import { HERO } from '../data/landingContent.js'
 
 /**
- * Landing page — deliberately minimal per the redesign brief:
- * navbar -> hero (with the interactive route map) -> footer. No stat
- * blocks, no feature-card grid, no second CTA banner. First stop in the
- * product journey (Landing -> Auth -> Dashboard -> ... per PROJECT_MEMORY.md);
- * CTAs are inert until the auth screen exists.
+ * Landing page — navbar -> hero (illustrated night-city scene + the
+ * interactive route map) -> footer. No stat blocks, no feature-card grid,
+ * no second CTA banner. First stop in the product journey
+ * (Landing -> Auth -> Dashboard -> ... per PROJECT_MEMORY.md).
  */
 function LandingPage() {
   return (
@@ -17,8 +17,9 @@ function LandingPage() {
 
       <section
         id="find-a-ride"
-        className="bg-hero-glow mx-auto flex max-w-6xl flex-col-reverse items-center gap-12 px-6 py-16 md:flex-row md:items-center md:gap-16 md:py-28"
+        className="relative isolate mx-auto flex max-w-6xl flex-col-reverse items-center gap-12 px-6 py-16 md:flex-row md:items-center md:gap-16 md:py-28"
       >
+        <NightCityScene />
         <div className="flex-1 text-center md:text-left">
           <span className="animate-fade-in-up inline-flex items-center gap-2 rounded-full border border-border-default bg-bg-card px-3 py-1 text-xs font-medium tracking-wide text-text-secondary">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-amber" />
