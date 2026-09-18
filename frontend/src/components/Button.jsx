@@ -13,6 +13,10 @@ const VARIANT_CLASSES = {
     'bg-accent-amber text-bg-page hover:bg-accent-amber-light hover:-translate-y-0.5 hover:shadow-[0_10px_26px_-6px_rgba(217,130,43,0.5)] active:translate-y-0 active:bg-accent-amber-dark focus-visible:outline-accent-amber-light',
   secondary:
     'border border-border-default text-text-primary hover:border-accent-amber/60 hover:-translate-y-0.5 hover:bg-bg-card-alt/60 active:translate-y-0 active:bg-bg-card-alt focus-visible:outline-border-default',
+  outlineDanger:
+    'border border-danger-DEFAULT/50 text-danger-DEFAULT hover:border-danger-DEFAULT hover:bg-danger-DEFAULT/10 focus-visible:outline-danger-DEFAULT',
+  danger:
+    'bg-danger-DEFAULT text-text-primary hover:bg-danger-dark focus-visible:outline-danger-DEFAULT',
 }
 
 function Button({ variant = 'primary', className = '', to, children, ...rest }) {

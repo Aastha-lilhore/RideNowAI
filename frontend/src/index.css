@@ -189,3 +189,31 @@ body {
     transform: none;
   }
 }
+
+/*
+  Leaflet map markers (Live Ride screen) — Leaflet ships no default marker
+  image import in this setup, so pickup/destination/vehicle are simple
+  CSS-drawn dots in the Midnight Amber palette instead.
+*/
+.map-pin {
+  border-radius: 9999px;
+  border: 2px solid var(--color-bg-page);
+}
+
+.map-pin-start {
+  background-color: var(--color-text-secondary);
+}
+
+.map-pin-end {
+  background-color: var(--color-accent-amber-light);
+}
+
+.map-pin-vehicle {
+  background-color: var(--color-accent-amber);
+  box-shadow: 0 0 0 4px rgba(217, 130, 43, 0.3);
+}
+
+.leaflet-container {
+  background-color: var(--color-bg-page) !important;
+  font-family: var(--font-sans);
+}

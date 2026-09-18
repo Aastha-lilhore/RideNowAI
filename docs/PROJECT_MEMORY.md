@@ -80,10 +80,10 @@ AI recommendations should be explainable, not merely labeled "AI".
 
 ## Current Phase
 Screens 1–6 built: Landing, Auth, Home Dashboard, Ride Search, AI Results,
-Ride Details (real driver/vehicle profile, trip recap, Confirm Ride).
-Live Ride is a placeholder confirming the confirmed-ride handoff works;
-Activity, Safety and Insights tabs are still placeholders.
+Ride Details, Live Ride (interactive Leaflet map, simulated moving driver
+marker, Share Ride, SOS with confirmation). Activity, Safety and Insights
+tabs are still placeholders.
 
 ## Next Step
-Build the real Live Ride screen: live map tracking, driver location,
-route anomaly detection, and SOS (per REQUIREMENTS.md).
+Build Route Anomaly (normal monitoring + alert state) and Women's Safety
+Mode (the real Safety tab) per REQUIREMENTS.md.

@@ -217,3 +217,17 @@ export function getDriverForRide(ride) {
     },
   }
 }
+
+// Demo city center (Indore) — no real geocoding backend yet, so pickup/
+// destination are mocked as small deterministic offsets from this point.
+const CITY_CENTER = { lat: 22.7196, lng: 75.8577 }
+
+export function getRouteCoordinates(pickup, destination) {
+  const seed = hashString(`${pickup}::${destination}`)
+  const pickupOffset = { lat: (seededRandom(seed, 21) - 0.5) * 0.06, lng: (seededRandom(seed, 22) - 0.5) * 0.06 }
+  const destOffset = { lat: (seededRandom(seed, 23) - 0.5) * 0.06, lng: (seededRandom(seed, 24) - 0.5) * 0.06 }
+  return {
+    pickup: { lat: CITY_CENTER.lat + pickupOffset.lat, lng: CITY_CENTER.lng + pickupOffset.lng },
+    destination: { lat: CITY_CENTER.lat + destOffset.lat, lng: CITY_CENTER.lng + destOffset.lng },
+  }
+}
