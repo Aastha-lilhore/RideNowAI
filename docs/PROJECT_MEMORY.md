@@ -79,12 +79,11 @@ CANCELLED
 AI recommendations should be explainable, not merely labeled "AI".
 
 ## Current Phase
-Screens 1–5 built: Landing, Auth, Home Dashboard, Ride Search (priority
-selection), AI Results (real fare/safety/eco scoring per AI_FORMULAS.md).
-Ride Details is a placeholder confirming the selected-ride handoff works;
+Screens 1–6 built: Landing, Auth, Home Dashboard, Ride Search, AI Results,
+Ride Details (real driver/vehicle profile, trip recap, Confirm Ride).
+Live Ride is a placeholder confirming the confirmed-ride handoff works;
 Activity, Safety and Insights tabs are still placeholders.
 
 ## Next Step
-Build the real Ride Details screen: driver profile, vehicle details,
-distance/ETA/eco recap, and Confirm Ride (per REQUIREMENTS.md), leading
-into the Live Ride tracking screen.
+Build the real Live Ride screen: live map tracking, driver location,
+route anomaly detection, and SOS (per REQUIREMENTS.md).

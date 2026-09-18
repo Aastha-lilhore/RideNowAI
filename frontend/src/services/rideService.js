@@ -181,3 +181,39 @@ export function searchRides({ pickup, destination, priority }) {
     }, 500)
   })
 }
+
+const DRIVER_NAMES = ['Rahul Verma', 'Amit Sharma', 'Sunil Patel', 'Vikram Singh', 'Deepak Joshi', 'Manoj Kumar']
+const VEHICLE_MODELS = {
+  bike: ['Honda Activa', 'TVS Jupiter'],
+  auto: ['Bajaj RE', 'Piaggio Ape'],
+  sedan: ['Maruti Dzire', 'Honda City'],
+  suv: ['Mahindra XUV300', 'Toyota Innova'],
+}
+const FUEL_TYPES = { bike: 'Petrol', auto: 'CNG', sedan: 'Petrol', suv: 'Diesel' }
+
+function pick(list, seed) {
+  return list[Math.floor(seededRandom(seed, 9) * list.length)]
+}
+
+/**
+ * PLACEHOLDER: driver/vehicle data mocked until the backend exists, but
+ * shaped exactly like docs/API_CONTRACT.md's `drivers` and `vehicles`
+ * tables so this is the only function that needs to change later.
+ */
+export function getDriverForRide(ride) {
+  const seed = hashString(ride.id + ride.fare + ride.etaMin)
+  return {
+    name: pick(DRIVER_NAMES, seed),
+    rating: ride.driverRating,
+    total_rides: 400 + Math.round(seededRandom(seed, 11) * 3200),
+    safety_rating: ride.safetyScore / 20, // 0-100 -> 0-5 scale, matches `drivers.safety_rating`
+    verification_status: 'verified',
+    vehicle: {
+      model: pick(VEHICLE_MODELS[ride.id], seed),
+      vehicle_type: ride.vehicleLabel,
+      vehicle_number: `MP09 ${String.fromCharCode(65 + Math.floor(seededRandom(seed, 13) * 26))}${String.fromCharCode(65 + Math.floor(seededRandom(seed, 17) * 26))} ${1000 + Math.round(seededRandom(seed, 19) * 8999)}`,
+      fuel_type: FUEL_TYPES[ride.id],
+      capacity: ride.capacity,
+    },
+  }
+}
