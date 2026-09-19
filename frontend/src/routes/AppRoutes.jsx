@@ -7,6 +7,7 @@ import SearchPage from '../pages/SearchPage.jsx'
 import ResultsPage from '../pages/ResultsPage.jsx'
 import RideDetailsPage from '../pages/RideDetailsPage.jsx'
 import LiveRidePage from '../pages/LiveRidePage.jsx'
+import CompletionPage from '../pages/CompletionPage.jsx'
 import ActivityPage from '../pages/ActivityPage.jsx'
 import SafetyPage from '../pages/SafetyPage.jsx'
 import InsightsPage from '../pages/InsightsPage.jsx'
@@ -29,6 +30,7 @@ function AppRoutes() {
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/ride-details" element={<RideDetailsPage />} />
         <Route path="/live-ride" element={<LiveRidePage />} />
+        <Route path="/completion" element={<CompletionPage />} />
         <Route path="/activity" element={<ActivityPage />} />
         <Route path="/safety" element={<SafetyPage />} />
         <Route path="/insights" element={<InsightsPage />} />

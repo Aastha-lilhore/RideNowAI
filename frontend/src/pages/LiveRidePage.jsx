@@ -171,8 +171,11 @@ function LiveRidePage() {
       {shareStatus && <p className="mt-2 text-center text-xs text-text-secondary">{shareStatus}</p>}
 
       {arrived && (
-        <Button className="mt-6 w-full" onClick={() => navigate('/dashboard')}>
-          Trip complete — back to Dashboard
+        <Button
+          className="mt-6 w-full"
+          onClick={() => navigate('/completion', { state: { ride, driver, pickup, destination } })}
+        >
+          Trip complete
         </Button>
       )}
     </div>

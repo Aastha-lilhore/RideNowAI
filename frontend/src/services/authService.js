@@ -48,3 +48,18 @@ export function login({ email, password }) {
     }, MOCK_DELAY_MS)
   })
 }
+
+/**
+ * PLACEHOLDER: Google sign-in (docs/REQUIREMENTS.md -> Authentication ->
+ * "Optional Google sign-in"). No real OAuth flow exists yet — there's no
+ * backend to exchange a Google token with — so this just mocks a
+ * successful sign-in after a short delay. Swapping in the real Google
+ * Identity Services flow later only touches this function.
+ */
+export function loginWithGoogle() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ user: mockUser({ name: 'Google User', email: 'demo.user@gmail.com' }), token: 'mock-token' })
+    }, MOCK_DELAY_MS)
+  })
+}

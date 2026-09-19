@@ -79,12 +79,13 @@ CANCELLED
 AI recommendations should be explainable, not merely labeled "AI".
 
 ## Current Phase
-All REQUIREMENTS.md screens are now built with real logic: Landing, Auth,
-Home Dashboard, Ride Search, AI Results, Ride Details, Live Ride (+ Route
-Anomaly alert state), Safety (Women's Safety Mode), Activity (ride
-history), and Insights (spending/distance/safety/eco stats). Everything
-runs on mocked services shaped exactly like API_CONTRACT.md so a real
-backend can be wired in without touching the pages themselves.
+All REQUIREMENTS.md screens are now built with real logic: Landing, Auth
+(email/password + mocked Google sign-in), Home Dashboard, Ride Search, AI
+Results, Ride Details, Live Ride (+ Route Anomaly alert state), Safety
+(Women's Safety Mode), Activity (ride history), Insights, and a
+Completion screen (trip recap + driver rating) closing the ride journey.
+Everything runs on mocked services shaped exactly like API_CONTRACT.md so
+a real backend can be wired in without touching the pages themselves.
 
 ## Next Step
 Nothing left in REQUIREMENTS.md's functional list is unbuilt. Candidates

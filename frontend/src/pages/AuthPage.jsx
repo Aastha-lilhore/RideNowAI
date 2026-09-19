@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import Button from '../components/Button.jsx'
 import TextField from '../components/TextField.jsx'
-import { login, register } from '../services/authService.js'
+import { login, register, loginWithGoogle } from '../services/authService.js'
 
 /**
  * Auth screen — Landing -> Auth -> Dashboard per docs/PROJECT_MEMORY.md.
@@ -19,6 +19,7 @@ function AuthPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' })
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
   const navigate = useNavigate()
 
   function updateField(field) {
@@ -37,6 +38,19 @@ function AuthPage() {
       setError(err?.error || 'Something went wrong. Please try again.')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setError('')
+    setGoogleLoading(true)
+    try {
+      const { user } = await loginWithGoogle()
+      navigate('/dashboard', { state: { name: user.name } })
+    } catch {
+      setError('Google sign-in failed. Please try again.')
+    } finally {
+      setGoogleLoading(false)
     }
   }
 
@@ -119,6 +133,28 @@ function AuthPage() {
               {submitting ? 'Please wait…' : tab === 'signup' ? 'Create account' : 'Log in'}
             </Button>
           </form>
+
+          <div className="my-5 flex items-center gap-3">
+            <span className="h-px flex-1 bg-border-default" />
+            <span className="text-xs text-text-secondary">or</span>
+            <span className="h-px flex-1 bg-border-default" />
+          </div>
+
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            onClick={handleGoogleSignIn}
+            disabled={googleLoading}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" className="mr-2" aria-hidden="true">
+              <circle cx="8" cy="8" r="7" fill="none" stroke="currentColor" strokeWidth="1.4" />
+              <text x="8" y="11.5" textAnchor="middle" fontSize="9" fontWeight="700" fill="currentColor">
+                G
+              </text>
+            </svg>
+            {googleLoading ? 'Please wait…' : 'Continue with Google'}
+          </Button>
         </div>
 
         <p className="mt-5 text-center text-xs text-text-secondary">
