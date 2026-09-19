@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet'
 import L from 'leaflet'
-import { ShieldCheck, Share2, TriangleAlert, Star } from 'lucide-react'
+import { ShieldCheck, ShieldAlert, Share2, TriangleAlert, Star, PhoneCall } from 'lucide-react'
 import Button from '../components/Button.jsx'
-import { getRouteCoordinates } from '../services/rideService.js'
+import { getRouteCoordinates, getAnomalyPlan } from '../services/rideService.js'
 
 /**
  * Live Ride (docs/REQUIREMENTS.md -> Live Ride): interactive map,
@@ -37,6 +37,9 @@ function LiveRidePage() {
   const [progress, setProgress] = useState(0)
   const [sosStage, setSosStage] = useState('idle') // idle | confirming | sent
   const [shareStatus, setShareStatus] = useState('')
+  const [anomalyDismissed, setAnomalyDismissed] = useState(false)
+
+  const anomalyPlan = useMemo(() => (ride ? getAnomalyPlan(ride) : { hasAnomaly: false }), [ride])
 
   useEffect(() => {
     if (!coords) return undefined
@@ -62,6 +65,11 @@ function LiveRidePage() {
   const vehiclePos = [lerp(coords.pickup.lat, coords.destination.lat, progress), lerp(coords.pickup.lng, coords.destination.lng, progress)]
   const remainingMin = Math.max(0, Math.round(ride.etaMin * (1 - progress)))
   const arrived = progress >= 1
+  const anomalyActive =
+    anomalyPlan.hasAnomaly &&
+    !anomalyDismissed &&
+    progress >= anomalyPlan.startProgress &&
+    progress <= anomalyPlan.endProgress
 
   async function handleShare() {
     const shareText = `Tracking my RideNow AI trip with ${driver.name} (${driver.vehicle.vehicle_number}), arriving in ${remainingMin} min.`
@@ -119,6 +127,37 @@ function LiveRidePage() {
           <Marker position={vehiclePos} icon={vehicleIcon} />
         </MapContainer>
       </div>
+
+      {/* Route Anomaly: normal monitoring state vs. alert state (docs/REQUIREMENTS.md -> Route Anomaly) */}
+      {anomalyActive ? (
+        <div className="mt-4 rounded-2xl border border-danger-DEFAULT/50 bg-danger-DEFAULT/10 p-5">
+          <p className="flex items-center gap-2 font-display text-sm font-semibold text-danger-DEFAULT">
+            <ShieldAlert size={16} /> Route anomaly detected
+          </p>
+          <p className="mt-1.5 text-xs leading-relaxed text-text-secondary">
+            The vehicle has deviated about {anomalyPlan.deviationMeters}m from the planned route for over{' '}
+            {anomalyPlan.deviationMinutes} minutes.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button variant="secondary" onClick={() => setAnomalyDismissed(true)} className="text-xs">
+              I'm safe, continue
+            </Button>
+            <a
+              href={`tel:${driver.phone.replace(/\s+/g, '')}`}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border-default px-3.5 py-2 text-xs text-text-primary transition-colors hover:border-accent-amber/60"
+            >
+              <PhoneCall size={14} /> Call driver
+            </a>
+            <Button variant="danger" onClick={() => setSosStage('confirming')} className="text-xs">
+              Trigger SOS
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-border-default bg-bg-card px-4 py-2.5 text-xs text-text-secondary">
+          <ShieldCheck size={14} className="text-success-DEFAULT" /> Monitoring route — no anomalies detected
+        </div>
+      )}
 
       {/* Driver + ride status */}
       <div className="mt-4 flex items-center gap-4 rounded-2xl border border-border-default bg-bg-card p-5">

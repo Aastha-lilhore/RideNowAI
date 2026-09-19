@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { Star, ShieldCheck, Leaf } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
+import { Star, ShieldCheck, Leaf, CircleCheck } from 'lucide-react'
 import Button from '../components/Button.jsx'
 
 /**
@@ -23,9 +23,9 @@ function CompletionPage() {
     return (
       <main className="mx-auto flex max-w-lg flex-col items-center gap-3 px-6 py-16 text-center">
         <h1 className="font-display text-2xl font-semibold text-text-primary">No trip to rate</h1>
-        <p className="text-sm text-text-secondary">Complete a ride first.</p>
+        <p className="text-sm text-text-secondary">Complete a ride to see your trip summary here.</p>
         <Button to="/dashboard" className="mt-2">
-          Back to Dashboard
+          Find a Ride
         </Button>
       </main>
     )
@@ -33,15 +33,48 @@ function CompletionPage() {
 
   if (submitted) {
     return (
-      <main className="mx-auto flex max-w-lg flex-col items-center gap-3 px-6 py-16 text-center">
-        <span className="rounded-full border border-border-default bg-bg-card px-4 py-1 text-xs text-accent-amber-light">
-          Thanks!
-        </span>
-        <h1 className="font-display text-2xl font-semibold text-text-primary">Rating submitted</h1>
-        <p className="text-sm text-text-secondary">Hope you enjoyed your ride with {driver.name}.</p>
-        <Button to="/dashboard" className="mt-2">
-          Back to Dashboard
-        </Button>
+      <main className="mx-auto flex max-w-lg flex-col items-center px-6 py-16 text-center">
+        <div className="success-pop flex h-16 w-16 items-center justify-center rounded-full bg-accent-amber/15">
+          <CircleCheck size={36} className="text-accent-amber-light" strokeWidth={1.75} />
+        </div>
+        <h1 className="animate-fade-in-up mt-5 font-display text-2xl font-semibold text-text-primary">
+          Thanks for riding with RideNow AI
+        </h1>
+        <p className="animate-fade-in-up mt-1 text-sm text-text-secondary" style={{ animationDelay: '80ms' }}>
+          Your feedback on {driver.name} has been recorded.
+        </p>
+
+        <div
+          className="animate-fade-in-up mt-6 w-full rounded-2xl border border-border-default bg-bg-card p-5 text-left"
+          style={{ animationDelay: '160ms' }}
+        >
+          <p className="text-sm text-text-primary">
+            {pickup} → {destination}
+          </p>
+          <div className="mt-2 flex items-center justify-between">
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((value) => (
+                <Star
+                  key={value}
+                  size={14}
+                  className={
+                    value <= rating ? 'fill-accent-amber-light text-accent-amber-light' : 'text-border-default'
+                  }
+                />
+              ))}
+            </div>
+            <span className="font-display text-sm font-semibold text-text-primary">₹{ride.fare}</span>
+          </div>
+        </div>
+
+        <div className="mt-6 flex w-full flex-col gap-2 sm:flex-row">
+          <Button to="/dashboard" className="flex-1">
+            Find Another Ride
+          </Button>
+          <Button to="/insights" variant="secondary" className="flex-1">
+            View Insights
+          </Button>
+        </div>
       </main>
     )
   }

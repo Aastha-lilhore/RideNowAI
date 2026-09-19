@@ -208,6 +208,7 @@ export function getDriverForRide(ride) {
     total_rides: 400 + Math.round(seededRandom(seed, 11) * 3200),
     safety_rating: ride.safetyScore / 20, // 0-100 -> 0-5 scale, matches `drivers.safety_rating`
     verification_status: 'verified',
+    phone: `+91 9${100000000 + Math.floor(seededRandom(seed, 27) * 899999999)}`,
     vehicle: {
       model: pick(VEHICLE_MODELS[ride.id], seed),
       vehicle_type: ride.vehicleLabel,
@@ -247,4 +248,28 @@ const RIDE_HISTORY = [
 
 export function getRideHistory() {
   return RIDE_HISTORY
+}
+
+/**
+ * Route anomaly detection (docs/AI_FORMULAS.md -> Route anomaly detection):
+ * stand-in for an Isolation Forest over {distance from expected route,
+ * deviation duration, unexpected stop duration, speed, route progress}.
+ * No live GPS feed yet, so this schedules ONE deterministic simulated
+ * deviation window per ride (or none, ~50% of rides) instead of computing
+ * a real distance-from-route each tick — same threshold rule (deviation
+ * > ~500m persisting), mocked input.
+ */
+export function getAnomalyPlan(ride) {
+  const seed = hashString(`${ride.id}-anomaly`)
+  const hasAnomaly = seededRandom(seed, 31) > 0.5
+  if (!hasAnomaly) return { hasAnomaly: false }
+
+  const startProgress = 0.35 + seededRandom(seed, 32) * 0.2
+  return {
+    hasAnomaly: true,
+    startProgress,
+    endProgress: startProgress + 0.22,
+    deviationMeters: 500 + Math.round(seededRandom(seed, 33) * 400),
+    deviationMinutes: 2 + Math.round(seededRandom(seed, 34) * 3),
+  }
 }

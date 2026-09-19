@@ -129,6 +129,36 @@ body {
   }
 }
 
+/* Safety tab header icon: gentle float + a soft breathing glow pulse */
+.safety-float {
+  animation: safety-float 3.2s ease-in-out infinite;
+}
+
+@keyframes safety-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.safety-pulse {
+  animation: safety-pulse 2.4s ease-in-out infinite;
+  filter: blur(6px);
+}
+
+@keyframes safety-pulse {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 0.15;
+  }
+}
+
 /*
   Emphasis treatment for the one accented phrase in the headline: solid
   amber color plus an underline stroke that draws in once on load. A
@@ -177,6 +207,22 @@ body {
   animation: fade-in-up 0.6s ease-out both;
 }
 
+/* Success checkmark on Completion — a small scale+fade pop, one-shot */
+.success-pop {
+  animation: success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes success-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in-up,
   .text-accent-highlight::after,
@@ -184,7 +230,10 @@ body {
   .twinkle,
   .headlight-pass,
   .route-flow,
-  .ridebuddy-patrol {
+  .ridebuddy-patrol,
+  .success-pop,
+  .safety-float,
+  .safety-pulse {
     animation: none;
     transform: none;
   }
