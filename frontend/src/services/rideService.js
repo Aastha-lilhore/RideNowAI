@@ -231,3 +231,20 @@ export function getRouteCoordinates(pickup, destination) {
     destination: { lat: CITY_CENTER.lat + destOffset.lat, lng: CITY_CENTER.lng + destOffset.lng },
   }
 }
+
+/**
+ * PLACEHOLDER: ride history — no `rides`/`ride_insights` backend tables
+ * yet, so this is a fixed mock list shaped like those two tables merged
+ * (docs/API_CONTRACT.md), for the Activity and Insights tabs to read.
+ */
+const RIDE_HISTORY = [
+  { id: 'h1', pickup: 'Vijay Nagar Square', destination: 'Rajwada', vehicleLabel: 'Auto', distance: 6.2, actual_duration: 19, actual_fare: 96, safety_score: 88, eco_score: 80, co2_estimate: 0.7, time_saved: 4, completed_at: '2026-09-12' },
+  { id: 'h2', pickup: 'MG Road', destination: 'Airport', vehicleLabel: 'Sedan', distance: 11.4, actual_duration: 28, actual_fare: 214, safety_score: 93, eco_score: 55, co2_estimate: 1.9, time_saved: 6, completed_at: '2026-09-10' },
+  { id: 'h3', pickup: 'Bhawarkuan', destination: 'Vijay Nagar Square', vehicleLabel: 'Bike', distance: 4.8, actual_duration: 14, actual_fare: 52, safety_score: 81, eco_score: 92, co2_estimate: 0.2, time_saved: 2, completed_at: '2026-09-08' },
+  { id: 'h4', pickup: 'Central Station', destination: 'Rajwada', vehicleLabel: 'Auto', distance: 3.1, actual_duration: 11, actual_fare: 48, safety_score: 85, eco_score: 78, co2_estimate: 0.4, time_saved: 3, completed_at: '2026-09-05' },
+  { id: 'h5', pickup: 'Airport', destination: 'MG Road', vehicleLabel: 'SUV', distance: 12.0, actual_duration: 31, actual_fare: 289, safety_score: 95, eco_score: 40, co2_estimate: 2.4, time_saved: 8, completed_at: '2026-09-02' },
+]
+
+export function getRideHistory() {
+  return RIDE_HISTORY
+}

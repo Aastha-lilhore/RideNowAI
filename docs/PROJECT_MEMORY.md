@@ -79,11 +79,19 @@ CANCELLED
 AI recommendations should be explainable, not merely labeled "AI".
 
 ## Current Phase
-Screens 1–6 built: Landing, Auth, Home Dashboard, Ride Search, AI Results,
-Ride Details, Live Ride (interactive Leaflet map, simulated moving driver
-marker, Share Ride, SOS with confirmation). Activity, Safety and Insights
-tabs are still placeholders.
+All REQUIREMENTS.md screens are now built with real logic: Landing, Auth,
+Home Dashboard, Ride Search, AI Results, Ride Details, Live Ride (+ Route
+Anomaly alert state), Safety (Women's Safety Mode), Activity (ride
+history), and Insights (spending/distance/safety/eco stats). Everything
+runs on mocked services shaped exactly like API_CONTRACT.md so a real
+backend can be wired in without touching the pages themselves.
 
+## Next Step
+Nothing left in REQUIREMENTS.md's functional list is unbuilt. Candidates
+for what comes next: docs/DESIGN_REFERENCE.md's Phase 7 (a final visual
+consistency pass across all 10 pages), or backend/API wiring once the
+backend teammate's endpoints exist, or something else — ask before
+picking one.
 ## Next Step
 Build Route Anomaly (normal monitoring + alert state) and Women's Safety
 Mode (the real Safety tab) per REQUIREMENTS.md.

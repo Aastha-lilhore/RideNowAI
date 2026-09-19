@@ -1,20 +1,24 @@
+import { getRideHistory } from '../services/rideService.js'
+import TripHistoryRow from '../components/TripHistoryRow.jsx'
+
 /**
- * Placeholder for the Activity tab — this is where Ride History
- * (docs/DESIGN_REFERENCE.md's "Trip history rows" pattern) will live.
- * Canonical home for past-trip data; nothing else should duplicate it.
+ * Activity tab — the canonical home for ride history
+ * (docs/REQUIREMENTS.md; row pattern from docs/DESIGN_REFERENCE.md).
  */
 function ActivityPage() {
+  const trips = getRideHistory()
+
   return (
-    <main className="mx-auto flex max-w-lg flex-col items-center gap-3 px-6 py-16 text-center">
-      <span className="rounded-full border border-border-default bg-bg-card px-4 py-1 text-xs text-accent-amber-light">
-        Coming next
-      </span>
+    <div className="mx-auto max-w-lg px-6 py-10">
       <h1 className="font-display text-2xl font-semibold text-text-primary">Activity</h1>
-      <p className="max-w-sm text-sm text-text-secondary">
-        Your ride history — route, distance, safety score and fare for each
-        past trip — will appear here.
-      </p>
-    </main>
+      <p className="mt-1 text-sm text-text-secondary">Your recent rides.</p>
+
+      <div className="mt-6 flex flex-col gap-3">
+        {trips.map((trip) => (
+          <TripHistoryRow key={trip.id} trip={trip} />
+        ))}
+      </div>
+    </div>
   )
 }
 
