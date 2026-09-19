@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Star, ShieldCheck, Leaf, Clock, MapPin } from 'lucide-react'
+import { Star, ShieldCheck, Leaf, Clock, MapPin, PhoneCall } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import { getDriverForRide } from '../services/rideService.js'
 
@@ -55,6 +55,13 @@ function RideDetailsPage() {
             {driver.rating.toFixed(1)} · {driver.total_rides.toLocaleString()} rides
           </p>
         </div>
+        <a
+          href={`tel:${driver.phone.replace(/\s+/g, '')}`}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border-default text-text-primary transition-colors hover:border-accent-amber/60"
+          aria-label={`Call ${driver.name}`}
+        >
+          <PhoneCall size={15} />
+        </a>
       </div>
 
       {/* Vehicle details */}

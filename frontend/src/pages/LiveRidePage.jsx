@@ -171,6 +171,13 @@ function LiveRidePage() {
             {driver.rating.toFixed(1)} · {driver.vehicle.model} · {driver.vehicle.vehicle_number}
           </p>
         </div>
+        <a
+          href={`tel:${driver.phone.replace(/\s+/g, '')}`}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border-default text-text-primary transition-colors hover:border-accent-amber/60"
+          aria-label={`Call ${driver.name}`}
+        >
+          <PhoneCall size={15} />
+        </a>
         <span className="flex items-center gap-1 rounded-full bg-bg-card-alt px-2.5 py-1 text-xs text-success-DEFAULT">
           <ShieldCheck size={12} /> {ride.safetyScore}
         </span>

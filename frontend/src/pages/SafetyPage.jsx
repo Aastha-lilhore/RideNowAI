@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ShieldCheck, ShieldHalf, TriangleAlert, Trash2, Radar, Share2 } from 'lucide-react'
+import { ShieldCheck, ShieldHalf, TriangleAlert, Trash2, Radar, Share2, Star, Plus } from 'lucide-react'
 import Switch from '../components/Switch.jsx'
 import TextField from '../components/TextField.jsx'
 import Button from '../components/Button.jsx'
@@ -23,8 +23,9 @@ function SafetyPage() {
   const [liveSharing, setLiveSharing] = useState(true)
   const [routeMonitoring, setRouteMonitoring] = useState(true)
 
-  const [contact, setContact] = useState(null)
+  const [contacts, setContacts] = useState([])
   const [contactForm, setContactForm] = useState({ name: '', phone: '' })
+  const [addingContact, setAddingContact] = useState(true)
 
   const [sosStage, setSosStage] = useState('idle') // idle | confirming | sent
 
@@ -34,8 +35,13 @@ function SafetyPage() {
   function handleAddContact(e) {
     e.preventDefault()
     if (!contactForm.name.trim() || !contactForm.phone.trim()) return
-    setContact(contactForm)
+    setContacts((prev) => [...prev, { ...contactForm, id: Date.now() }])
     setContactForm({ name: '', phone: '' })
+    setAddingContact(false)
+  }
+
+  function removeContact(id) {
+    setContacts((prev) => prev.filter((c) => c.id !== id))
   }
 
   return (
@@ -104,25 +110,37 @@ function SafetyPage() {
         )}
       </div>
 
-      {/* Trusted contact */}
+      {/* Trusted contacts — matches trusted_contacts table: multiple contacts, first is primary */}
       <div className="mt-4 rounded-2xl border border-border-default bg-bg-card p-5">
-        <p className="font-display text-sm font-semibold text-text-primary">Trusted contact</p>
-        {contact ? (
-          <div className="mt-3 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-text-primary">{contact.name}</p>
-              <p className="text-xs text-text-secondary">{contact.phone}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setContact(null)}
-              className="rounded-md p-2 text-text-secondary transition-colors hover:text-danger-DEFAULT"
-              aria-label="Remove trusted contact"
-            >
-              <Trash2 size={16} />
-            </button>
+        <p className="font-display text-sm font-semibold text-text-primary">Trusted contacts</p>
+
+        {contacts.length > 0 && (
+          <div className="mt-3 flex flex-col gap-2">
+            {contacts.map((c, index) => (
+              <div key={c.id} className="flex items-center justify-between rounded-lg bg-bg-card-alt px-3.5 py-2.5">
+                <div>
+                  <p className="flex items-center gap-1.5 text-sm text-text-primary">
+                    {c.name}
+                    {index === 0 && (
+                      <Star size={11} className="fill-accent-amber-light text-accent-amber-light" aria-label="Primary contact" />
+                    )}
+                  </p>
+                  <p className="text-xs text-text-secondary">{c.phone}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeContact(c.id)}
+                  className="rounded-md p-2 text-text-secondary transition-colors hover:text-danger-DEFAULT"
+                  aria-label={`Remove ${c.name}`}
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
           </div>
-        ) : (
+        )}
+
+        {addingContact ? (
           <form onSubmit={handleAddContact} className="mt-3 flex flex-col gap-3">
             <TextField
               id="contact-name"
@@ -138,10 +156,25 @@ function SafetyPage() {
               value={contactForm.phone}
               onChange={(e) => setContactForm((p) => ({ ...p, phone: e.target.value }))}
             />
-            <Button type="submit" variant="secondary" className="self-start">
-              Add contact
-            </Button>
+            <div className="flex gap-2">
+              <Button type="submit" variant="secondary" className="flex-1">
+                Add contact
+              </Button>
+              {contacts.length > 0 && (
+                <Button type="button" variant="secondary" className="flex-1" onClick={() => setAddingContact(false)}>
+                  Cancel
+                </Button>
+              )}
+            </div>
           </form>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setAddingContact(true)}
+            className="mt-3 flex items-center gap-1.5 text-xs font-medium text-accent-amber-light hover:underline"
+          >
+            <Plus size={14} /> Add another contact
+          </button>
         )}
       </div>
 

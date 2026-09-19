@@ -1,17 +1,44 @@
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { getRideHistory } from '../services/rideService.js'
 
 /**
  * Insights tab (docs/REQUIREMENTS.md -> Insights): total spending,
  * distance, ride count, average safety, AI insights, sustainability
- * stats. Layout follows docs/DESIGN_REFERENCE.md: a 2-column grid of
- * metric tiles plus one full-width eco panel with a progress bar.
- * All numbers are computed from the same mock ride history the Activity
- * tab uses — not separately invented.
+ * stats — now a real mini-dashboard with two charts (fare per ride,
+ * safety score trend) rather than just tiles. All numbers come from the
+ * same mock ride history the Activity tab uses — nothing separately
+ * invented.
  */
 const CO2_GOAL_KG = 10 // arbitrary monthly demo goal, shown so the progress bar has meaning
 
+const CHART_COLORS = {
+  grid: '#2e2924',
+  axis: '#a39a8f',
+  amber: '#d9822b',
+  amberLight: '#f0a94e',
+}
+
+function shortDate(dateStr) {
+  return new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+}
+
+function ChartTooltip({ active, payload, label, unit }) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="rounded-md border border-border-default bg-bg-card-alt px-3 py-2 text-xs">
+      <p className="text-text-secondary">{label}</p>
+      <p className="font-medium text-text-primary">
+        {payload[0].value}
+        {unit}
+      </p>
+    </div>
+  )
+}
+
 function InsightsPage() {
   const trips = getRideHistory()
+  // charts read oldest -> newest, left to right
+  const chronological = [...trips].reverse().map((t) => ({ ...t, dateLabel: shortDate(t.completed_at) }))
 
   const totalSpending = trips.reduce((sum, t) => sum + t.actual_fare, 0)
   const totalDistance = Math.round(trips.reduce((sum, t) => sum + t.distance, 0) * 10) / 10
@@ -40,6 +67,60 @@ function InsightsPage() {
             <p className="mt-1 font-display text-lg font-semibold text-text-primary">{tile.value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Fare per ride */}
+      <div className="mt-4 rounded-2xl border border-border-default bg-bg-card p-5">
+        <p className="text-sm font-medium text-text-primary">Fare per ride</p>
+        <div className="mt-3 h-40">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chronological} margin={{ left: -20, right: 8, top: 4, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} vertical={false} />
+              <XAxis
+                dataKey="dateLabel"
+                tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
+                axisLine={{ stroke: CHART_COLORS.grid }}
+                tickLine={false}
+              />
+              <YAxis tick={{ fill: CHART_COLORS.axis, fontSize: 11 }} axisLine={false} tickLine={false} width={32} />
+              <Tooltip content={<ChartTooltip unit=" ₹" />} cursor={{ fill: 'rgba(217,130,43,0.08)' }} />
+              <Bar dataKey="actual_fare" fill={CHART_COLORS.amber} radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Safety score trend */}
+      <div className="mt-4 rounded-2xl border border-border-default bg-bg-card p-5">
+        <p className="text-sm font-medium text-text-primary">Safety score trend</p>
+        <div className="mt-3 h-40">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart data={chronological} margin={{ left: -20, right: 8, top: 4, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_COLORS.grid} vertical={false} />
+              <XAxis
+                dataKey="dateLabel"
+                tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
+                axisLine={{ stroke: CHART_COLORS.grid }}
+                tickLine={false}
+              />
+              <YAxis
+                domain={[0, 100]}
+                tick={{ fill: CHART_COLORS.axis, fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                width={32}
+              />
+              <Tooltip content={<ChartTooltip unit="/100" />} cursor={{ stroke: CHART_COLORS.grid }} />
+              <Line
+                type="monotone"
+                dataKey="safety_score"
+                stroke={CHART_COLORS.amberLight}
+                strokeWidth={2}
+                dot={{ fill: CHART_COLORS.amberLight, r: 3 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       <div className="mt-4 rounded-2xl border border-border-default bg-bg-card p-5">
