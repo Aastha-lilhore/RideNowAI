@@ -48,11 +48,18 @@ function InsightsPage() {
   const totalTimeSaved = trips.reduce((sum, t) => sum + t.time_saved, 0)
   const co2Progress = Math.min(100, Math.round((totalCo2Saved / CO2_GOAL_KG) * 100))
 
+  const latestSafetyDelta = trips[0].safety_score - avgSafety
+
   const tiles = [
     { label: 'Total spending', value: `₹${totalSpending}` },
     { label: 'Distance travelled', value: `${totalDistance} km` },
     { label: 'Ride count', value: rideCount },
-    { label: 'Average safety', value: `${avgSafety}/100` },
+    {
+      label: 'Average safety',
+      value: `${avgSafety}/100`,
+      trend: `${latestSafetyDelta >= 0 ? '+' : ''}${latestSafetyDelta} vs your average`,
+      trendTone: latestSafetyDelta >= 0 ? 'text-success-DEFAULT' : 'text-warning-DEFAULT',
+    },
   ]
 
   return (
@@ -65,6 +72,7 @@ function InsightsPage() {
           <div key={tile.label} className="rounded-xl border border-border-default bg-bg-card p-4">
             <p className="text-xs text-text-secondary">{tile.label}</p>
             <p className="mt-1 font-display text-lg font-semibold text-text-primary">{tile.value}</p>
+            {tile.trend && <p className={`mt-0.5 text-[11px] ${tile.trendTone}`}>{tile.trend}</p>}
           </div>
         ))}
       </div>

@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import { ShieldCheck, ShieldAlert, Share2, TriangleAlert, Star, PhoneCall } from 'lucide-react'
 import Button from '../components/Button.jsx'
+import StatusBadge from '../components/StatusBadge.jsx'
 import { getRouteCoordinates, getAnomalyPlan } from '../services/rideService.js'
 
 /**
@@ -96,7 +97,12 @@ function LiveRidePage() {
 
   return (
     <div className="mx-auto max-w-lg px-6 py-8">
-      <h1 className="font-display text-2xl font-semibold text-text-primary">
+      <StatusBadge
+        label={anomalyActive ? 'ALERT' : arrived ? 'ARRIVED' : 'RIDE IN PROGRESS'}
+        tone={anomalyActive ? 'danger' : arrived ? 'success' : 'amber'}
+        pulse={!arrived}
+      />
+      <h1 className="mt-3 font-display text-2xl font-semibold text-text-primary">
         {arrived ? 'Driver has arrived' : 'On the way'}
       </h1>
       <p className="mt-1 text-sm text-text-secondary">

@@ -3,6 +3,7 @@ import { ShieldCheck, ShieldHalf, TriangleAlert, Trash2, Radar, Share2, Star, Pl
 import Switch from '../components/Switch.jsx'
 import TextField from '../components/TextField.jsx'
 import Button from '../components/Button.jsx'
+import StatusBadge from '../components/StatusBadge.jsx'
 import { getRideHistory } from '../services/rideService.js'
 import { SAFETY_FEATURES } from '../data/safetyFeatures.js'
 
@@ -61,6 +62,12 @@ function SafetyPage() {
           </p>
         </div>
       </div>
+
+      {safetyMode && (
+        <div className="mt-4">
+          <StatusBadge label="SAFETY MODE ACTIVE" tone="success" />
+        </div>
+      )}
 
       {/* Safety Mode */}
       <div className="mt-6 rounded-2xl border border-border-default bg-bg-card p-5">
