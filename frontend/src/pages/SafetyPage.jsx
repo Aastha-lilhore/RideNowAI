@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { ShieldCheck, ShieldHalf, TriangleAlert, Trash2, Radar, Share2, Star, Plus } from 'lucide-react'
+import { ShieldCheck, TriangleAlert, Trash2, Radar, Share2, Star, Plus } from 'lucide-react'
 import Switch from '../components/Switch.jsx'
 import TextField from '../components/TextField.jsx'
 import Button from '../components/Button.jsx'
 import StatusBadge from '../components/StatusBadge.jsx'
+import SafetyGuardianIllustration from '../components/SafetyGuardianIllustration.jsx'
 import { getRideHistory } from '../services/rideService.js'
 import { SAFETY_FEATURES } from '../data/safetyFeatures.js'
 
@@ -47,14 +48,10 @@ function SafetyPage() {
 
   return (
     <div className="mx-auto max-w-lg px-6 py-10">
-      {/* Header: pulsing shield + real average-safety stat, not an empty banner */}
-      <div className="flex items-center gap-4">
-        <div className="safety-float relative flex h-14 w-14 shrink-0 items-center justify-center">
-          <span className="safety-pulse absolute inset-0 rounded-full bg-accent-amber/35" />
-          <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-bg-card-alt">
-            <ShieldHalf size={26} className="text-accent-amber-light" strokeWidth={1.75} />
-          </span>
-        </div>
+      <SafetyGuardianIllustration />
+
+      {/* Header: title + real average-safety stat, not an empty banner */}
+      <div className="mt-5 flex items-center gap-4">
         <div>
           <h1 className="font-display text-2xl font-semibold text-text-primary">Safety</h1>
           <p className="text-sm text-text-secondary">

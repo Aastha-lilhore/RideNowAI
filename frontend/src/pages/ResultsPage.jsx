@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Star, Leaf, Sparkles } from 'lucide-react'
 import Button from '../components/Button.jsx'
+import { VEHICLE_COLORS } from '../data/vehicleColors.js'
 
 /**
  * AI Results (docs/REQUIREMENTS.md -> AI Results). Follows
@@ -67,7 +68,10 @@ function ResultsPage() {
 
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-display text-base font-semibold text-text-primary">{ride.vehicleLabel}</p>
+                  <p className="flex items-center gap-1.5 font-display text-base font-semibold text-text-primary">
+                    <span className={`h-2 w-2 rounded-full ${VEHICLE_COLORS[ride.id].dot}`} />
+                    {ride.vehicleLabel}
+                  </p>
                   <p className="mt-0.5 flex items-center gap-1 text-xs text-text-secondary">
                     <Star size={12} className="fill-accent-amber-light text-accent-amber-light" />
                     {ride.driverRating.toFixed(1)} · {ride.capacity} seats

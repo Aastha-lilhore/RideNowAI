@@ -1,5 +1,7 @@
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { ShieldCheck, Leaf } from 'lucide-react'
 import { getRideHistory } from '../services/rideService.js'
+import { VEHICLE_COLORS } from '../data/vehicleColors.js'
 
 /**
  * Insights tab (docs/REQUIREMENTS.md -> Insights): total spending,
@@ -49,6 +51,20 @@ function InsightsPage() {
   const co2Progress = Math.min(100, Math.round((totalCo2Saved / CO2_GOAL_KG) * 100))
 
   const latestSafetyDelta = trips[0].safety_score - avgSafety
+
+  // Vehicle-type breakdown — ride count per type, for the mini bar list
+  const byVehicle = trips.reduce((acc, t) => {
+    const key = t.vehicleLabel.toLowerCase()
+    acc[key] = acc[key] || { label: t.vehicleLabel, count: 0, spend: 0 }
+    acc[key].count += 1
+    acc[key].spend += t.actual_fare
+    return acc
+  }, {})
+  const vehicleBreakdown = Object.entries(byVehicle).map(([key, v]) => ({ key, ...v }))
+  const maxVehicleCount = Math.max(...vehicleBreakdown.map((v) => v.count))
+
+  const safestTrip = trips.reduce((best, t) => (t.safety_score > best.safety_score ? t : best), trips[0])
+  const ecoTrip = trips.reduce((best, t) => (t.eco_score > best.eco_score ? t : best), trips[0])
 
   const tiles = [
     { label: 'Total spending', value: `₹${totalSpending}` },
@@ -128,6 +144,47 @@ function InsightsPage() {
               />
             </LineChart>
           </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Vehicle-type breakdown */}
+      <div className="mt-4 rounded-2xl border border-border-default bg-bg-card p-5">
+        <p className="text-sm font-medium text-text-primary">Rides by vehicle type</p>
+        <div className="mt-3 flex flex-col gap-2.5">
+          {vehicleBreakdown.map((v) => (
+            <div key={v.key} className="flex items-center gap-3">
+              <span className="w-12 shrink-0 text-xs text-text-secondary">{v.label}</span>
+              <div className="h-2 flex-1 overflow-hidden rounded-full bg-bg-card-alt">
+                <div
+                  className={`h-full rounded-full ${VEHICLE_COLORS[v.key].bar}`}
+                  style={{ width: `${(v.count / maxVehicleCount) * 100}%` }}
+                />
+              </div>
+              <span className="w-16 shrink-0 text-right text-xs text-text-secondary">₹{v.spend}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Highlights */}
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-border-default bg-bg-card p-4">
+          <p className="flex items-center gap-1.5 text-xs text-text-secondary">
+            <ShieldCheck size={13} className="text-success-DEFAULT" /> Safest ride
+          </p>
+          <p className="mt-1 text-sm text-text-primary">
+            {safestTrip.pickup} → {safestTrip.destination}
+          </p>
+          <p className="mt-0.5 text-xs text-success-DEFAULT">{safestTrip.safety_score}/100</p>
+        </div>
+        <div className="rounded-xl border border-border-default bg-bg-card p-4">
+          <p className="flex items-center gap-1.5 text-xs text-text-secondary">
+            <Leaf size={13} className="text-success-DEFAULT" /> Most eco-friendly
+          </p>
+          <p className="mt-1 text-sm text-text-primary">
+            {ecoTrip.pickup} → {ecoTrip.destination}
+          </p>
+          <p className="mt-0.5 text-xs text-success-DEFAULT">{ecoTrip.eco_score}/100</p>
         </div>
       </div>
 

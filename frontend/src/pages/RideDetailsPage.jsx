@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { Star, ShieldCheck, Leaf, Clock, MapPin, PhoneCall } from 'lucide-react'
 import Button from '../components/Button.jsx'
 import { getDriverForRide } from '../services/rideService.js'
+import { VEHICLE_COLORS } from '../data/vehicleColors.js'
 
 /**
  * Ride Details (docs/REQUIREMENTS.md -> Ride Details): driver profile,
@@ -66,7 +67,10 @@ function RideDetailsPage() {
 
       {/* Vehicle details */}
       <div className="mt-4 rounded-2xl border border-border-default bg-bg-card p-5">
-        <p className="font-display text-sm font-semibold text-text-primary">{driver.vehicle.model}</p>
+        <p className="flex items-center gap-1.5 font-display text-sm font-semibold text-text-primary">
+          <span className={`h-2 w-2 rounded-full ${VEHICLE_COLORS[ride.id].dot}`} />
+          {driver.vehicle.model}
+        </p>
         <p className="mt-1 text-xs text-text-secondary">
           {driver.vehicle.vehicle_number} · {driver.vehicle.fuel_type} · {driver.vehicle.capacity} seats
         </p>
