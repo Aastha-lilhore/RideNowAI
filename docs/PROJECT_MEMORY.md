@@ -85,10 +85,16 @@ patterns (colors kept as Midnight Amber, which postdates that doc): the
 AI-recommended card gets an amber border + "AI TOP PICK" badge on AI
 Results, safety/eco are tinted metric-chip pills, Live Ride/Safety show
 colored-dot status badges, and Insights' safety tile has a real trend
-note. Everything still runs on mocked services shaped like
-API_CONTRACT.md.
+note. A vehicle-type color system, a Safety illustration, and Insights'
+vehicle breakdown + highlight cards were added after that. Backend-wiring
+infrastructure is now in place: services/apiClient.js (axios + env-based
+mock/real switch), frontend/.env.example, and register/login/searchRides
+are already wired to real endpoints behind VITE_USE_MOCKS=false. See
+docs/BACKEND_INTEGRATION.md for exactly what's wired vs. what still needs
+a small restructure (driver assignment, anomaly polling, live tracking,
+ride history — no endpoint for that last one yet).
 
 ## Next Step
-Not yet decided — candidates are extending the polish pass further
-(loading/error states, remaining screens), or backend/API wiring once
-the backend teammate's endpoints exist. Ask before picking one.
+Not yet decided — candidates are working through BACKEND_INTEGRATION.md's
+remaining items once the backend is up, or further visual polish. Ask
+before picking one.

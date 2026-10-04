@@ -7,6 +7,7 @@
  * this file. Do not invent alternate weights; docs/AI_FORMULAS.md is the
  * source of truth.
  */
+import apiClient, { USE_MOCKS } from './apiClient.js'
 
 const VEHICLE_TYPES = [
   { id: 'bike', label: 'Bike', baseFare: 20, perKm: 6, perMin: 1, capacity: 1, driverRatingBase: 4.5, ecoBase: 92, routeSafetyBase: 76, historyBase: 88 },
@@ -140,6 +141,10 @@ function rankByRecommendation(rides) {
  * deterministic per route string) until that service exists.
  */
 export function searchRides({ pickup, destination, priority }) {
+  if (!USE_MOCKS) {
+    return apiClient.post('/api/rides/search', { pickup, destination, priority }).then((res) => res.data)
+  }
+
   return new Promise((resolve) => {
     setTimeout(() => {
       const seed = hashString(`${pickup}->${destination}`)
