@@ -1,5 +1,5 @@
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { ShieldCheck, Leaf } from 'lucide-react'
+import { ShieldCheck, Leaf, BarChart3 } from 'lucide-react'
 import { getRideHistory } from '../services/rideService.js'
 import { VEHICLE_COLORS } from '../data/vehicleColors.js'
 
@@ -39,6 +39,24 @@ function ChartTooltip({ active, payload, label, unit }) {
 
 function InsightsPage() {
   const trips = getRideHistory()
+
+  // Every stat/chart below depends on having at least one ride — a
+  // brand-new user (or the real backend returning no history yet) gets
+  // an explicit empty state instead of NaN tiles and empty charts.
+  if (trips.length === 0) {
+    return (
+      <div className="mx-auto max-w-lg px-6 py-10">
+        <h1 className="font-display text-2xl font-semibold text-text-primary">Insights</h1>
+        <div className="mt-10 flex flex-col items-center gap-2 text-center">
+          <BarChart3 size={28} className="text-text-secondary" strokeWidth={1.5} />
+          <p className="text-sm text-text-secondary">
+            Complete your first ride to start seeing insights here.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
   // charts read oldest -> newest, left to right
   const chronological = [...trips].reverse().map((t) => ({ ...t, dateLabel: shortDate(t.completed_at) }))
 

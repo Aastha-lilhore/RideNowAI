@@ -20,6 +20,19 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
+// Normalizes every real-backend failure to the same `{ error: '...' }`
+// shape the mocks already reject with (API_CONTRACT.md's own error shape
+// for login), so every page's existing catch blocks work unchanged
+// whether USE_MOCKS is true or false — no call-site changes needed here
+// either.
+apiClient.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    const message = err.response?.data?.error || (err.request ? 'Network error. Please try again.' : err.message)
+    return Promise.reject({ error: message })
+  },
+)
+
 export function persistSession({ token }) {
   if (token) localStorage.setItem('ridenow_token', token)
 }

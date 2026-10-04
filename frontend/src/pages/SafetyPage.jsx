@@ -32,7 +32,8 @@ function SafetyPage() {
   const [sosStage, setSosStage] = useState('idle') // idle | confirming | sent
 
   const trips = getRideHistory()
-  const avgSafety = Math.round(trips.reduce((sum, t) => sum + t.safety_score, 0) / trips.length)
+  const avgSafety =
+    trips.length > 0 ? Math.round(trips.reduce((sum, t) => sum + t.safety_score, 0) / trips.length) : null
 
   function handleAddContact(e) {
     e.preventDefault()
@@ -55,7 +56,13 @@ function SafetyPage() {
         <div>
           <h1 className="font-display text-2xl font-semibold text-text-primary">Safety</h1>
           <p className="text-sm text-text-secondary">
-            Average ride safety score: <span className="font-medium text-text-primary">{avgSafety}/100</span>
+            {avgSafety !== null ? (
+              <>
+                Average ride safety score: <span className="font-medium text-text-primary">{avgSafety}/100</span>
+              </>
+            ) : (
+              'Complete a ride to see your safety score here.'
+            )}
           </p>
         </div>
       </div>

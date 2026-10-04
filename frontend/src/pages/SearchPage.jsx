@@ -23,14 +23,21 @@ function SearchPage() {
   const [destination, setDestination] = useState(location.state?.destination || '')
   const [priority, setPriority] = useState('ai')
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const canSearch = pickup.trim() !== '' && destination.trim() !== ''
 
   async function handleSearch() {
     if (!canSearch) return
+    setError('')
     setLoading(true)
-    const results = await searchRides({ pickup, destination, priority })
-    navigate('/results', { state: { ...results, priority } })
+    try {
+      const results = await searchRides({ pickup, destination, priority })
+      navigate('/results', { state: { ...results, priority } })
+    } catch (err) {
+      setError(err?.error || 'Could not find rides right now. Please try again.')
+      setLoading(false)
+    }
   }
 
   return (
@@ -85,6 +92,8 @@ function SearchPage() {
           )
         })}
       </div>
+
+      {error && <p className="mt-4 text-center text-xs text-danger-DEFAULT">{error}</p>}
 
       <Button className="mt-6 w-full" onClick={handleSearch} disabled={loading || !canSearch}>
         {loading ? 'Finding rides…' : 'Search Rides'}

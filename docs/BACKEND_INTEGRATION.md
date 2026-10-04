@@ -14,6 +14,18 @@ response shapes — this file tracks wiring status, not the contract itself.
 With no `.env` file, the app defaults to mocks — nothing breaks for
 teammates who don't have the backend running yet.
 
+## Error handling
+
+`apiClient.js` normalizes every real-backend failure (4xx/5xx, network
+errors) to the same `{ error: '...' }` shape the mocks already reject
+with, so existing `catch` blocks on every page work unchanged either way.
+
+## Empty states
+
+Activity, Safety, and Insights now handle zero ride history explicitly
+(a real new user will have none) instead of showing `NaN` or broken
+charts — see the `trips.length === 0` branches in those pages.
+
 ## Already wired (just flip the env var above)
 
 - `authService.register()` → `POST /api/auth/register`
