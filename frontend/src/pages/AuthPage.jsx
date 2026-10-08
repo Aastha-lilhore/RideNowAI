@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'
+import { useNavigate, useLocation, useSearchParams, Link } from 'react-router-dom'
 import Button from '../components/Button.jsx'
 import TextField from '../components/TextField.jsx'
 import { login, register, loginWithGoogle } from '../services/authService.js'
@@ -14,6 +14,9 @@ import { useAuth } from '../context/AuthContext.jsx'
  */
 function AuthPage() {
   const [searchParams] = useSearchParams()
+  const location = useLocation()
+  // where RequireAuth bounced them from, if anywhere — go back there after login
+  const destinationAfterLogin = location.state?.from || '/dashboard'
   const initialTab = searchParams.get('tab') === 'signup' ? 'signup' : 'login'
   const [tab, setTab] = useState(initialTab)
 
@@ -36,7 +39,7 @@ function AuthPage() {
       const action = tab === 'signup' ? register : login
       const { user } = await action(form)
       setSessionUser(user)
-      navigate('/dashboard')
+      navigate(destinationAfterLogin, { replace: true })
     } catch (err) {
       setError(err?.error || 'Something went wrong. Please try again.')
     } finally {
@@ -50,7 +53,7 @@ function AuthPage() {
     try {
       const { user } = await loginWithGoogle()
       setSessionUser(user)
-      navigate('/dashboard')
+      navigate(destinationAfterLogin, { replace: true })
     } catch {
       setError('Google sign-in failed. Please try again.')
     } finally {

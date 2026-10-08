@@ -102,6 +102,11 @@ desktop, a new minimal top strip on mobile) is the one entry point to
 it. Profile edits are local-only until a user-update endpoint exists in
 API_CONTRACT.md.
 
+Authenticated screens now sit behind routes/RequireAuth.jsx (signed-out
+visitors are sent to login, then back to where they were headed) and
+unknown URLs show pages/NotFoundPage.jsx. The guard is UX only — the
+backend must enforce access on every API call.
+
 ## Next Step
 Not yet decided — candidates are working through BACKEND_INTEGRATION.md's
 remaining items once the backend is up, or further visual polish. Ask
