@@ -107,6 +107,10 @@ visitors are sent to login, then back to where they were headed) and
 unknown URLs show pages/NotFoundPage.jsx. The guard is UX only — the
 backend must enforce access on every API call.
 
+Authenticated screens are lazy-loaded (routes/AppRoutes.jsx), which cut
+the entry bundle from ~920KB to ~340KB; Recharts (Insights) and Leaflet
+(Live Ride) now only download when those screens open.
+
 ## Next Step
 Not yet decided — candidates are working through BACKEND_INTEGRATION.md's
 remaining items once the backend is up, or further visual polish. Ask
