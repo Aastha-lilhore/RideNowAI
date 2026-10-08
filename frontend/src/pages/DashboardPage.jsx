@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { MapPin, Navigation } from 'lucide-react'
 import TextField from '../components/TextField.jsx'
 import Button from '../components/Button.jsx'
 import RideBuddyBanner from '../components/RideBuddyBanner.jsx'
 import { QUICK_ACTIONS } from '../data/quickActions.js'
+import { useAuth } from '../context/AuthContext.jsx'
 
 /**
  * Home Dashboard (docs/REQUIREMENTS.md -> Dashboard): greeting, pickup +
@@ -14,8 +15,8 @@ import { QUICK_ACTIONS } from '../data/quickActions.js'
  * carries pickup/destination forward to /search.
  */
 function DashboardPage() {
-  const location = useLocation()
-  const name = location.state?.name
+  const { user } = useAuth()
+  const name = user?.name
   const navigate = useNavigate()
 
   const [pickup, setPickup] = useState('')

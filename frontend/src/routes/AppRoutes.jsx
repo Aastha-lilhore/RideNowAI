@@ -11,6 +11,7 @@ import CompletionPage from '../pages/CompletionPage.jsx'
 import ActivityPage from '../pages/ActivityPage.jsx'
 import SafetyPage from '../pages/SafetyPage.jsx'
 import InsightsPage from '../pages/InsightsPage.jsx'
+import ProfilePage from '../pages/ProfilePage.jsx'
 
 /**
  * Central route table for RideNow AI.
@@ -34,6 +35,7 @@ function AppRoutes() {
         <Route path="/activity" element={<ActivityPage />} />
         <Route path="/safety" element={<SafetyPage />} />
         <Route path="/insights" element={<InsightsPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Route>
     </Routes>
   )

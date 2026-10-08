@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import Button from '../components/Button.jsx'
 import TextField from '../components/TextField.jsx'
 import { login, register, loginWithGoogle } from '../services/authService.js'
+import { useAuth } from '../context/AuthContext.jsx'
 
 /**
  * Auth screen — Landing -> Auth -> Dashboard per docs/PROJECT_MEMORY.md.
@@ -21,6 +22,7 @@ function AuthPage() {
   const [submitting, setSubmitting] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const navigate = useNavigate()
+  const { login: setSessionUser } = useAuth()
 
   function updateField(field) {
     return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))
@@ -33,7 +35,8 @@ function AuthPage() {
     try {
       const action = tab === 'signup' ? register : login
       const { user } = await action(form)
-      navigate('/dashboard', { state: { name: user.name } })
+      setSessionUser(user)
+      navigate('/dashboard')
     } catch (err) {
       setError(err?.error || 'Something went wrong. Please try again.')
     } finally {
@@ -46,7 +49,8 @@ function AuthPage() {
     setGoogleLoading(true)
     try {
       const { user } = await loginWithGoogle()
-      navigate('/dashboard', { state: { name: user.name } })
+      setSessionUser(user)
+      navigate('/dashboard')
     } catch {
       setError('Google sign-in failed. Please try again.')
     } finally {

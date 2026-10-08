@@ -64,6 +64,11 @@ already treats the result as a Promise.
   `POST /api/safety/alert-contact` exist in the contract but aren't
   called yet — the buttons currently just show a local "sent" state.
 
+- **Profile edits** (Profile screen): editing name/phone/gender only
+  updates the in-browser session (`AuthContext.updateProfile`) — there's
+  no `PUT /api/users` (or similar) endpoint in API_CONTRACT.md yet. Add
+  one there first, then call it from `ProfilePage`'s save handler.
+
 - **Google sign-in**: needs the real Google Identity Services SDK
   integrated client-side, plus a backend endpoint to exchange the Google
   token — neither exists yet.

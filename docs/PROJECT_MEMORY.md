@@ -94,6 +94,14 @@ docs/BACKEND_INTEGRATION.md for exactly what's wired vs. what still needs
 a small restructure (driver assignment, anomaly polling, live tracking,
 ride history — no endpoint for that last one yet).
 
+An account area now exists: context/AuthContext.jsx holds the current
+user (persisted to localStorage; replaces the old one-off route-state
+passing), pages/ProfilePage.jsx shows/edits the profile and has the
+app's only Log out button, and a profile avatar in AppShell (top bar on
+desktop, a new minimal top strip on mobile) is the one entry point to
+it. Profile edits are local-only until a user-update endpoint exists in
+API_CONTRACT.md.
+
 ## Next Step
 Not yet decided — candidates are working through BACKEND_INTEGRATION.md's
 remaining items once the backend is up, or further visual polish. Ask
