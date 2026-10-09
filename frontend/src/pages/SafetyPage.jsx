@@ -6,6 +6,8 @@ import Button from '../components/Button.jsx'
 import StatusBadge from '../components/StatusBadge.jsx'
 import SafetyGuardianIllustration from '../components/SafetyGuardianIllustration.jsx'
 import { getRideHistory } from '../services/rideService.js'
+import { useAuth } from '../context/AuthContext.jsx'
+import usePersistedState from '../hooks/usePersistedState.js'
 import { SAFETY_FEATURES } from '../data/safetyFeatures.js'
 
 const FEATURE_ICONS = { Radar, ShieldCheck, Share2, TriangleAlert }
@@ -17,17 +19,23 @@ const FEATURE_ICONS = { Radar, ShieldCheck, Share2, TriangleAlert }
  * standalone SOS. Shows real substance (average safety score, feature
  * list) even before the mode is switched on, rather than an empty toggle.
  *
- * PLACEHOLDER: settings and the trusted contact live only in this
- * session's state — there's no account backend yet to persist them to.
+ * PLACEHOLDER: settings and trusted contacts persist in this browser
+ * (localStorage, per user) — there's no account backend yet to save them
+ * server-side, so they won't follow the user to another device.
  */
 function SafetyPage() {
-  const [safetyMode, setSafetyMode] = useState(false)
-  const [liveSharing, setLiveSharing] = useState(true)
-  const [routeMonitoring, setRouteMonitoring] = useState(true)
+  // Scoped per user so two accounts on one browser don't share settings.
+  const { user } = useAuth()
+  const scope = user?.email || 'guest'
 
-  const [contacts, setContacts] = useState([])
+  const [safetyMode, setSafetyMode] = usePersistedState(`ridenow_safety_mode_${scope}`, false)
+  const [liveSharing, setLiveSharing] = usePersistedState(`ridenow_live_sharing_${scope}`, true)
+  const [routeMonitoring, setRouteMonitoring] = usePersistedState(`ridenow_route_monitoring_${scope}`, true)
+
+  const [contacts, setContacts] = usePersistedState(`ridenow_contacts_${scope}`, [])
   const [contactForm, setContactForm] = useState({ name: '', phone: '' })
-  const [addingContact, setAddingContact] = useState(true)
+  // open the add form only when there's nobody saved yet
+  const [addingContact, setAddingContact] = useState(contacts.length === 0)
 
   const [sosStage, setSosStage] = useState('idle') // idle | confirming | sent
 

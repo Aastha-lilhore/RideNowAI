@@ -60,6 +60,12 @@ already treats the result as a Promise.
   ride-history-list endpoint in API_CONTRACT.md yet. Needs one added
   there first (e.g. `GET /api/rides?user_id=`) before this can be wired.
 
+- **Trusted contacts and Safety Mode settings** (Safety tab): saved in
+  the browser only (localStorage, per user, via `hooks/usePersistedState`)
+  so they survive a refresh but not a device change. Needs endpoints in
+  API_CONTRACT.md (a `trusted_contacts` table already exists in the
+  schema) before they can sync to the backend.
+
 - **SOS / Share Ride** (Live Ride, Safety): `POST /api/safety/sos` and
   `POST /api/safety/alert-contact` exist in the contract but aren't
   called yet — the buttons currently just show a local "sent" state.
