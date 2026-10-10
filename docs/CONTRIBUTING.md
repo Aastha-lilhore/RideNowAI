@@ -47,5 +47,20 @@ ui(frontend): establish design system
 fix(frontend): correct responsive navigation
 docs: update frontend progress
 
+## Running the tests
+
+From `frontend/`: `npm test` (runs once) — about 30 tests, a few seconds.
+
+They cover the parts most likely to break quietly: the AI scoring/ranking
+in `rideService`, the mock auth service, the route guard and 404, lazy
+loaded screens, Safety Mode/trusted-contact persistence, and the main
+sign-up -> search -> pick a ride -> confirm flow. Tests sit next to the
+code they cover (`*.test.js` / `*.test.jsx`); shared setup is in
+`src/test/setup.js`.
+
+Run `npm test` before pushing, and add a test when you fix a bug. When
+the backend is wired in, set `VITE_USE_MOCKS=true` for test runs so they
+don't depend on a live server.
+
 ## Team Principle
 Make changes that are easy for the next teammate to understand, test and extend.

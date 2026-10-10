@@ -111,6 +111,11 @@ Authenticated screens are lazy-loaded (routes/AppRoutes.jsx), which cut
 the entry bundle from ~920KB to ~340KB; Recharts (Insights) and Leaflet
 (Live Ride) now only download when those screens open.
 
+The frontend now has a permanent automated test suite (`npm test` in
+frontend/, ~30 tests: scoring logic, auth service, route guard + 404,
+lazy screens, Safety persistence, and the core ride flow). Verified to
+fail when the guard, sort order or persistence are deliberately broken.
+
 ## Next Step
 Not yet decided — candidates are working through BACKEND_INTEGRATION.md's
 remaining items once the backend is up, or further visual polish. Ask
