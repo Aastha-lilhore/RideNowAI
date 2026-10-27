@@ -5,6 +5,7 @@ import Button from '../components/Button.jsx'
 import TextField from '../components/TextField.jsx'
 import { PRIORITIES } from '../data/priorities.js'
 import { searchRides } from '../services/rideService.js'
+import MapPicker from '../components/MapPicker.jsx'
 
 const ICONS = { Sparkles, IndianRupee, Zap, ShieldCheck }
 
@@ -63,6 +64,10 @@ function SearchPage() {
           onChange={(e) => setDestination(e.target.value)}
         />
       </div>
+            <MapPicker
+        onPickupChange={setPickup}
+        onDestinationChange={setDestination}
+      />
 
       <p className="mt-6 text-xs font-medium text-text-secondary">Priority</p>
       <div className="mt-2 grid grid-cols-2 gap-3">
