@@ -1,11 +1,6 @@
+
 /**
  * Ride search + AI scoring service.
- *
- * Every formula here is a deliberate stand-in for a future ML model,
- * exactly as docs/AI_FORMULAS.md specifies — same inputs/outputs, so
- * swapping in the real model later doesn't change anything that calls
- * this file. Do not invent alternate weights; docs/AI_FORMULAS.md is the
- * source of truth.
  */
 import apiClient, { USE_MOCKS } from './apiClient.js'
 
@@ -16,7 +11,6 @@ const VEHICLE_TYPES = [
   { id: 'suv', label: 'SUV', baseFare: 90, perKm: 17, perMin: 1.8, capacity: 6, driverRatingBase: 4.6, ecoBase: 40, routeSafetyBase: 92, historyBase: 90 },
 ]
 
-/** Deterministic hash so the same pickup/destination always mocks the same trip. */
 function hashString(str) {
   let h = 0
   for (let i = 0; i < str.length; i += 1) {
@@ -25,7 +19,6 @@ function hashString(str) {
   return h
 }
 
-/** Small deterministic pseudo-random in [0,1), seeded by a hash + salt. */
 function seededRandom(seed, salt) {
   const x = Math.sin(seed + salt) * 10000
   return x - Math.floor(x)
@@ -37,31 +30,27 @@ function timeOfDayMultiplier() {
   return isPeak ? 1.15 : 1.0
 }
 
-/**
- * Fare prediction (docs/AI_FORMULAS.md -> Fare prediction).
- * Stand-in for a Random Forest Regressor over the same feature set:
- * distance, duration, vehicle type, time of day, traffic, demand, weather.
- */
 function predictFare(vehicle, distanceKm, durationMin) {
-  const trafficMultiplier = 1.15 // mocked "moderate" traffic; real value from live traffic data later
-  const demandMultiplier = 1.0 // mocked "normal" demand
-  const weatherMultiplier = 1.0 // mocked "clear" weather
+  const trafficMultiplier = 1.15
+  const demandMultiplier = 1.0
+  const weatherMultiplier = 1.0
   const base = vehicle.baseFare + vehicle.perKm * distanceKm + vehicle.perMin * durationMin
-  const fare = base * trafficMultiplier * demandMultiplier * weatherMultiplier * timeOfDayMultiplier()
-  return Math.round(fare)
+  return Math.round(base * trafficMultiplier * demandMultiplier * weatherMultiplier * timeOfDayMultiplier())
 }
 
-/**
- * Safety score (docs/AI_FORMULAS.md -> Safety score): weighted 0-100.
- * Component scores are mocked deterministically per vehicle/route until
- * the real driver-history and route-risk data sources exist.
- */
+function safetyLabel(score) {
+  if (score >= 85) return 'Very Safe'
+  if (score >= 70) return 'Safe'
+  if (score >= 40) return 'Moderate'
+  return 'High Risk'
+}
+
 function computeSafetyScore(vehicle, seed) {
   const driverRatingScore = (vehicle.driverRatingBase / 5) * 100
   const driverHistoryScore = vehicle.historyBase + seededRandom(seed, 1) * 6 - 3
   const routeSafetyScore = vehicle.routeSafetyBase + seededRandom(seed, 2) * 8 - 4
   const timeOfDayScore = timeOfDayMultiplier() > 1 ? 65 : 90
-  const trafficScore = 78 // mocked "moderate" traffic
+  const trafficScore = 78
   const areaRiskScore = 82 + seededRandom(seed, 3) * 10 - 5
 
   const score =
@@ -75,25 +64,10 @@ function computeSafetyScore(vehicle, seed) {
   return Math.round(Math.min(100, Math.max(0, score)))
 }
 
-function safetyLabel(score) {
-  if (score >= 85) return 'Very Safe'
-  if (score >= 70) return 'Safe'
-  if (score >= 40) return 'Moderate'
-  return 'High Risk'
-}
-
-/** Eco score (docs/AI_FORMULAS.md -> Eco score), normalized 0-100 by vehicle type. */
 function computeEcoScore(vehicle, seed) {
   return Math.round(Math.min(100, Math.max(0, vehicle.ecoBase + seededRandom(seed, 4) * 6 - 3)))
 }
 
-/**
- * Recommendation score (docs/AI_FORMULAS.md -> Recommendation score):
- * 0.40*safety + 0.30*costEfficiency + 0.20*timeEfficiency + 0.10*eco,
- * with cost/time efficiency normalized against the other candidates in
- * this same search. Also builds the plain-English reason string from the
- * real numbers, per the "AI must be explainable" rule.
- */
 function rankByRecommendation(rides) {
   const fares = rides.map((r) => r.fare)
   const etas = rides.map((r) => r.etaMin)
@@ -109,16 +83,22 @@ function rankByRecommendation(rides) {
       const costEfficiency = maxFare === minFare ? 1 : 1 - (ride.fare - minFare) / (maxFare - minFare)
       const timeEfficiency = maxEta === minEta ? 1 : 1 - (ride.etaMin - minEta) / (maxEta - minEta)
       const recommendationScore =
-        0.4 * (ride.safetyScore / 100) + 0.3 * costEfficiency + 0.2 * timeEfficiency + 0.1 * (ride.ecoScore / 100)
+        0.4 * (ride.safetyScore / 100) +
+        0.3 * costEfficiency +
+        0.2 * timeEfficiency +
+        0.1 * (ride.ecoScore / 100)
 
       const parts = []
+
       if (ride.id !== cheapest.id && cheapest.fare < ride.fare) {
         const pct = Math.round(((ride.fare - cheapest.fare) / cheapest.fare) * 100)
         if (pct > 0) parts.push(`only ${pct}% more than the cheapest option`)
       } else if (ride.id === cheapest.id) {
         parts.push('the cheapest option available')
       }
+
       parts.push(`${ride.safetyScore}/100 safety`)
+
       if (ride.id === fastest.id) {
         parts.push('the fastest to arrive')
       } else {
@@ -136,19 +116,66 @@ function rankByRecommendation(rides) {
 }
 
 /**
- * PLACEHOLDER: no backend yet, so pickup/destination don't hit a real
- * geocoding/routing API — distance and duration are mocked (but
- * deterministic per route string) until that service exists.
+ * Search rides through the backend or local mock service.
  */
 export function searchRides({ pickup, destination, priority }) {
   if (!USE_MOCKS) {
-    return apiClient.post('/api/rides/search', { pickup, destination, priority }).then((res) => res.data)
+    const coordinates = getRouteCoordinates(pickup, destination)
+
+    const backendPriority = {
+      ai: 'balanced',
+      safest: 'safety',
+      cheapest: 'cheap',
+      fastest: 'fast',
+      eco: 'eco',
+    }[priority] || 'balanced'
+
+    return apiClient.post('/api/rides/search', {
+      pickup: {
+        latitude: coordinates.pickup.lat,
+        longitude: coordinates.pickup.lng,
+      },
+      destination: {
+        latitude: coordinates.destination.lat,
+        longitude: coordinates.destination.lng,
+      },
+      priority: backendPriority,
+    }).then((res) => {
+      const data = res.data
+
+      return {
+        pickup,
+        destination,
+        distanceKm: data.estimated_distance_km,
+        rides: data.rides.map((ride) => ({
+          id: ride.ride_id,
+          vehicleLabel: ride.vehicle_type,
+          fare: ride.estimated_fare,
+          etaMin: ride.estimated_duration,
+          distanceKm: ride.distance_km,
+          safetyScore: ride.safety_score,
+          safetyLabel: ride.safety_score >= 85
+            ? 'Very Safe'
+            : ride.safety_score >= 70
+              ? 'Safe'
+              : 'Moderate',
+          ecoScore: ride.eco_score,
+          capacity: {
+            Bike: 1,
+            Auto: 3,
+            Mini: 4,
+            Sedan: 4,
+          }[ride.vehicle_type] || 4,
+          driverRating: 4.5,
+        })),
+      }
+    })
   }
 
   return new Promise((resolve) => {
     setTimeout(() => {
       const seed = hashString(`${pickup}->${destination}`)
-      const distanceKm = 3 + (seed % 1200) / 100 // ~3–15 km
+      const distanceKm = 3 + (seed % 1200) / 100
       const baseDurationMin = Math.round(distanceKm * 3.2)
 
       let rides = VEHICLE_TYPES.map((vehicle, i) => {
@@ -157,6 +184,7 @@ export function searchRides({ pickup, destination, priority }) {
         const etaMin = Math.round(baseDurationMin * (1 + i * 0.08) * timeOfDayMultiplier())
         const safetyScore = computeSafetyScore(vehicle, vSeed)
         const ecoScore = computeEcoScore(vehicle, vSeed)
+
         return {
           id: vehicle.id,
           vehicleLabel: vehicle.label,
@@ -180,68 +208,124 @@ export function searchRides({ pickup, destination, priority }) {
       } else if (priority === 'safest') {
         rides = [...rides].sort((a, b) => b.safetyScore - a.safetyScore)
       }
-      // 'ai' priority: already sorted by recommendationScore
 
-      resolve({ rides, distanceKm: Math.round(distanceKm * 10) / 10, pickup, destination })
+      resolve({
+        rides,
+        distanceKm: Math.round(distanceKm * 10) / 10,
+        pickup,
+        destination,
+      })
     }, 500)
   })
 }
 
-const DRIVER_NAMES = ['Rahul Verma', 'Amit Sharma', 'Sunil Patel', 'Vikram Singh', 'Deepak Joshi', 'Manoj Kumar']
+const DRIVER_NAMES = [
+  'Rahul Verma',
+  'Amit Sharma',
+  'Sunil Patel',
+  'Vikram Singh',
+  'Deepak Joshi',
+  'Manoj Kumar',
+]
+
 const VEHICLE_MODELS = {
   bike: ['Honda Activa', 'TVS Jupiter'],
   auto: ['Bajaj RE', 'Piaggio Ape'],
   sedan: ['Maruti Dzire', 'Honda City'],
   suv: ['Mahindra XUV300', 'Toyota Innova'],
 }
-const FUEL_TYPES = { bike: 'Petrol', auto: 'CNG', sedan: 'Petrol', suv: 'Diesel' }
+
+const FUEL_TYPES = {
+  bike: 'Petrol',
+  auto: 'CNG',
+  sedan: 'Petrol',
+  suv: 'Diesel',
+}
 
 function pick(list, seed) {
   return list[Math.floor(seededRandom(seed, 9) * list.length)]
 }
 
 /**
- * PLACEHOLDER: driver/vehicle data mocked until the backend exists, but
- * shaped exactly like docs/API_CONTRACT.md's `drivers` and `vehicles`
- * tables so this is the only function that needs to change later.
+ * Generate demo driver and vehicle details.
  */
 export function getDriverForRide(ride) {
-  const seed = hashString(ride.id + ride.fare + ride.etaMin)
+  const seed = hashString(String(ride.id) + ride.fare + ride.etaMin)
+
+  const vehicleKeyMap = {
+    bike: 'bike',
+    auto: 'auto',
+    mini: 'sedan',
+    sedan: 'sedan',
+    suv: 'suv',
+  }
+
+  const vehicleKey =
+    vehicleKeyMap[String(ride.vehicleLabel || '').toLowerCase()] || 'sedan'
+
+  const safetyScore = ride.safetyScore ?? 80
+
   return {
     name: pick(DRIVER_NAMES, seed),
-    rating: ride.driverRating,
+    rating: ride.driverRating ?? 4.5,
     total_rides: 400 + Math.round(seededRandom(seed, 11) * 3200),
-    safety_rating: ride.safetyScore / 20, // 0-100 -> 0-5 scale, matches `drivers.safety_rating`
+    safety_rating: safetyScore / 20,
     verification_status: 'verified',
     phone: `+91 9${100000000 + Math.floor(seededRandom(seed, 27) * 899999999)}`,
     vehicle: {
-      model: pick(VEHICLE_MODELS[ride.id], seed),
-      vehicle_type: ride.vehicleLabel,
+      model: pick(VEHICLE_MODELS[vehicleKey], seed),
+      vehicle_type: ride.vehicleLabel || 'Sedan',
       vehicle_number: `MP09 ${String.fromCharCode(65 + Math.floor(seededRandom(seed, 13) * 26))}${String.fromCharCode(65 + Math.floor(seededRandom(seed, 17) * 26))} ${1000 + Math.round(seededRandom(seed, 19) * 8999)}`,
-      fuel_type: FUEL_TYPES[ride.id],
-      capacity: ride.capacity,
+      fuel_type: FUEL_TYPES[vehicleKey],
+      capacity: ride.capacity ?? 4,
     },
   }
 }
 
-// Demo city center (Indore) — no real geocoding backend yet, so pickup/
-// destination are mocked as small deterministic offsets from this point.
+// Demo city center (Indore). Coordinates are mocked, not real geocoding.
 const CITY_CENTER = { lat: 22.7196, lng: 75.8577 }
 
 export function getRouteCoordinates(pickup, destination) {
   const seed = hashString(`${pickup}::${destination}`)
-  const pickupOffset = { lat: (seededRandom(seed, 21) - 0.5) * 0.06, lng: (seededRandom(seed, 22) - 0.5) * 0.06 }
-  const destOffset = { lat: (seededRandom(seed, 23) - 0.5) * 0.06, lng: (seededRandom(seed, 24) - 0.5) * 0.06 }
+  const pickupOffset = {
+    lat: (seededRandom(seed, 21) - 0.5) * 0.06,
+    lng: (seededRandom(seed, 22) - 0.5) * 0.06,
+  }
+  const destOffset = {
+    lat: (seededRandom(seed, 23) - 0.5) * 0.06,
+    lng: (seededRandom(seed, 24) - 0.5) * 0.06,
+  }
+
   return {
-    pickup: { lat: CITY_CENTER.lat + pickupOffset.lat, lng: CITY_CENTER.lng + pickupOffset.lng },
-    destination: { lat: CITY_CENTER.lat + destOffset.lat, lng: CITY_CENTER.lng + destOffset.lng },
+    pickup: {
+      lat: CITY_CENTER.lat + pickupOffset.lat,
+      lng: CITY_CENTER.lng + pickupOffset.lng,
+    },
+    destination: {
+      lat: CITY_CENTER.lat + destOffset.lat,
+      lng: CITY_CENTER.lng + destOffset.lng,
+    },
   }
 }
 
 /**
- * PLACEHOLDER: ride history — no `rides`/`ride_insights` backend tables
- * yet, so this is a fixed mock list shaped like those two tables merged
- * (docs/API_CONTRACT.md), for the Activity and Insights tabs to read.
+ * Book a ride through the backend.
+ * The backend expects a ride ID such as SEARCH001.
+ */
+export function bookRide(rideId) {
+  if (USE_MOCKS) {
+    return Promise.reject(
+      new Error('Booking requires the backend API. Set VITE_USE_MOCKS=false.')
+    )
+  }
+
+  return apiClient.post('/api/rides/book', {
+    ride_id: rideId,
+  }).then((res) => res.data)
+}
+
+/**
+ * Demo ride history.
  */
 const RIDE_HISTORY = [
   { id: 'h1', pickup: 'Vijay Nagar Square', destination: 'Rajwada', vehicleLabel: 'Auto', distance: 6.2, actual_duration: 19, actual_fare: 96, safety_score: 88, eco_score: 80, co2_estimate: 0.7, time_saved: 4, completed_at: '2026-09-12' },
@@ -256,20 +340,16 @@ export function getRideHistory() {
 }
 
 /**
- * Route anomaly detection (docs/AI_FORMULAS.md -> Route anomaly detection):
- * stand-in for an Isolation Forest over {distance from expected route,
- * deviation duration, unexpected stop duration, speed, route progress}.
- * No live GPS feed yet, so this schedules ONE deterministic simulated
- * deviation window per ride (or none, ~50% of rides) instead of computing
- * a real distance-from-route each tick — same threshold rule (deviation
- * > ~500m persisting), mocked input.
+ * Demo route anomaly detection.
  */
 export function getAnomalyPlan(ride) {
   const seed = hashString(`${ride.id}-anomaly`)
   const hasAnomaly = seededRandom(seed, 31) > 0.5
+
   if (!hasAnomaly) return { hasAnomaly: false }
 
   const startProgress = 0.35 + seededRandom(seed, 32) * 0.2
+
   return {
     hasAnomaly: true,
     startProgress,

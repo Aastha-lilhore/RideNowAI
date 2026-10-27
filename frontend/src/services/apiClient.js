@@ -6,6 +6,8 @@ import axios from 'axios'
  * its mock implementation.
  */
 export const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== 'false'
+console.log('API base URL:', import.meta.env.VITE_API_BASE_URL)
+console.log('Using mock data:', USE_MOCKS)
 
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000',

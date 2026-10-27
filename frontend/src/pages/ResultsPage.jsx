@@ -69,7 +69,11 @@ function ResultsPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <p className="flex items-center gap-1.5 font-display text-base font-semibold text-text-primary">
-                    <span className={`h-2 w-2 rounded-full ${VEHICLE_COLORS[ride.id].dot}`} />
+                   <span
+  className={`h-2 w-2 rounded-full ${
+    VEHICLE_COLORS[ride.vehicleLabel?.toLowerCase()]?.dot || 'bg-gray-400'
+  }`}
+/>
                     {ride.vehicleLabel}
                   </p>
                   <p className="mt-0.5 flex items-center gap-1 text-xs text-text-secondary">
