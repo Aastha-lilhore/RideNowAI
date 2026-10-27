@@ -9,3 +9,14 @@ export const VEHICLE_COLORS = {
   sedan: { dot: 'bg-accent-amber', text: 'text-accent-amber-light', bar: 'bg-accent-amber' },
   suv: { dot: 'bg-warning-DEFAULT', text: 'text-warning-DEFAULT', bar: 'bg-warning-DEFAULT' },
 }
+
+const FALLBACK_COLORS = { dot: 'bg-text-secondary', text: 'text-text-secondary', bar: 'bg-text-secondary' }
+
+/**
+ * Colors for a vehicle by its type name ("Sedan" or "sedan"). Falls back to
+ * a neutral color for a type this list doesn't know, so a real backend
+ * returning something new (or omitting the field) can't crash a screen.
+ */
+export function colorsFor(vehicleType) {
+  return VEHICLE_COLORS[String(vehicleType || '').toLowerCase()] || FALLBACK_COLORS
+}

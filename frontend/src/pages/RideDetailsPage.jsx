@@ -1,20 +1,23 @@
+import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { Star, ShieldCheck, Leaf, Clock, MapPin, PhoneCall } from 'lucide-react'
 import Button from '../components/Button.jsx'
-import { getDriverForRide } from '../services/rideService.js'
-import { VEHICLE_COLORS } from '../data/vehicleColors.js'
+import { previewDriver, bookRide } from '../services/rideService.js'
+import { colorsFor } from '../data/vehicleColors.js'
 
 /**
  * Ride Details (docs/REQUIREMENTS.md -> Ride Details): driver profile,
  * vehicle details, safety score, estimated fare, distance, ETA, eco
- * score, and Confirm Ride. Driver/vehicle data is mocked (see
- * getDriverForRide in rideService.js) but shaped like the real DB tables
- * in API_CONTRACT.md.
+ * score, and Confirm Ride. Confirming books the ride (bookRide) and the
+ * driver it returns is what Live Ride tracks; the card shown here is only
+ * a preview when one exists (see previewDriver in rideService.js).
  */
 function RideDetailsPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const { ride, pickup, destination } = location.state || {}
+  const [booking, setBooking] = useState(false)
+  const [error, setError] = useState('')
 
   if (!ride) {
     return (
@@ -28,8 +31,20 @@ function RideDetailsPage() {
     )
   }
 
-  const driver = getDriverForRide(ride)
-  const initials = driver.name.split(' ').map((n) => n[0]).join('')
+  const driver = previewDriver(ride)
+  const initials = driver ? driver.name.split(' ').map((n) => n[0]).join('') : ''
+
+  async function handleConfirm() {
+    setError('')
+    setBooking(true)
+    try {
+      const booked = await bookRide(ride)
+      navigate('/live-ride', { state: { ride: booked.ride, driver: booked.driver, pickup, destination } })
+    } catch (err) {
+      setError(err?.error || 'Could not book this ride. Please try again.')
+      setBooking(false)
+    }
+  }
 
   return (
     <div className="mx-auto max-w-lg px-6 py-10">
@@ -39,42 +54,50 @@ function RideDetailsPage() {
         <span className="text-text-primary">{destination}</span>
       </p>
 
-      {/* Driver profile */}
-      <div className="mt-6 flex items-center gap-4 rounded-2xl border border-border-default bg-bg-card p-5">
-        <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-bg-card-alt font-display text-lg font-semibold text-accent-amber-light">
-          {initials}
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-1.5 font-display text-base font-semibold text-text-primary">
-            {driver.name}
-            {driver.verification_status === 'verified' && (
-              <ShieldCheck size={14} className="text-success-DEFAULT" aria-label="Verified driver" />
-            )}
-          </p>
-          <p className="mt-0.5 flex items-center gap-1 text-xs text-text-secondary">
-            <Star size={12} className="fill-accent-amber-light text-accent-amber-light" />
-            {driver.rating.toFixed(1)} · {driver.total_rides.toLocaleString()} rides
-          </p>
-        </div>
-        <a
-          href={`tel:${driver.phone.replace(/\s+/g, '')}`}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border-default text-text-primary transition-colors hover:border-accent-amber/60"
-          aria-label={`Call ${driver.name}`}
-        >
-          <PhoneCall size={15} />
-        </a>
-      </div>
+      {driver ? (
+        <>
+          {/* Driver profile */}
+          <div className="mt-6 flex items-center gap-4 rounded-2xl border border-border-default bg-bg-card p-5">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-bg-card-alt font-display text-lg font-semibold text-accent-amber-light">
+              {initials}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="flex items-center gap-1.5 font-display text-base font-semibold text-text-primary">
+                {driver.name}
+                {driver.verification_status === 'verified' && (
+                  <ShieldCheck size={14} className="text-success-DEFAULT" aria-label="Verified driver" />
+                )}
+              </p>
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-text-secondary">
+                <Star size={12} className="fill-accent-amber-light text-accent-amber-light" />
+                {driver.rating.toFixed(1)} · {driver.total_rides.toLocaleString()} rides
+              </p>
+            </div>
+            <a
+              href={`tel:${driver.phone.replace(/\s+/g, '')}`}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border-default text-text-primary transition-colors hover:border-accent-amber/60"
+              aria-label={`Call ${driver.name}`}
+            >
+              <PhoneCall size={15} />
+            </a>
+          </div>
 
-      {/* Vehicle details */}
-      <div className="mt-4 rounded-2xl border border-border-default bg-bg-card p-5">
-        <p className="flex items-center gap-1.5 font-display text-sm font-semibold text-text-primary">
-          <span className={`h-2 w-2 rounded-full ${VEHICLE_COLORS[ride.id].dot}`} />
-          {driver.vehicle.model}
+          {/* Vehicle details */}
+          <div className="mt-4 rounded-2xl border border-border-default bg-bg-card p-5">
+            <p className="flex items-center gap-1.5 font-display text-sm font-semibold text-text-primary">
+              <span className={`h-2 w-2 rounded-full ${colorsFor(ride.vehicleLabel).dot}`} />
+              {driver.vehicle.model}
+            </p>
+            <p className="mt-1 text-xs text-text-secondary">
+              {driver.vehicle.vehicle_number} · {driver.vehicle.fuel_type} · {driver.vehicle.capacity} seats
+            </p>
+          </div>
+        </>
+      ) : (
+        <p className="mt-6 rounded-2xl border border-border-default bg-bg-card p-5 text-sm text-text-secondary">
+          Your driver and vehicle are assigned as soon as you confirm.
         </p>
-        <p className="mt-1 text-xs text-text-secondary">
-          {driver.vehicle.vehicle_number} · {driver.vehicle.fuel_type} · {driver.vehicle.capacity} seats
-        </p>
-      </div>
+      )}
 
       {/* Trip recap */}
       <div className="mt-4 grid grid-cols-2 gap-3">
@@ -109,11 +132,10 @@ function RideDetailsPage() {
         <span className="font-display text-2xl font-semibold text-text-primary">₹{ride.fare}</span>
       </div>
 
-      <Button
-        className="mt-6 w-full"
-        onClick={() => navigate('/live-ride', { state: { ride, driver, pickup, destination } })}
-      >
-        Confirm Ride
+      {error && <p className="mt-4 text-center text-xs text-danger-DEFAULT">{error}</p>}
+
+      <Button className="mt-4 w-full" onClick={handleConfirm} disabled={booking}>
+        {booking ? 'Booking your ride…' : 'Confirm Ride'}
       </Button>
     </div>
   )
