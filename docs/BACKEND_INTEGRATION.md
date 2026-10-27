@@ -31,19 +31,36 @@ charts — see the `trips.length === 0` branches in those pages.
 - `authService.register()` → `POST /api/auth/register`
 - `authService.login()` → `POST /api/auth/login`
 - `rideService.searchRides()` → `POST /api/rides/search`
+- `rideService.bookRide()` → `POST /api/rides/book` (Confirm Ride on Ride
+  Details; the driver it returns is what Live Ride shows and tracks)
 
-These three needed no call-site changes — every page that calls them
-already treats the result as a Promise.
+The first three needed no call-site changes. `bookRide` did: Ride Details'
+Confirm button is now async (shows "Booking your ride…", disables itself,
+and shows the backend's error with a retry if booking fails).
+
+## What the frontend assumes the backend returns (please confirm)
+
+API_CONTRACT.md is loose on these response bodies, so the frontend was
+written against the shapes below. If the backend differs, change this
+section and the one service function — nothing else.
+
+- `POST /api/rides/search` — `{ rides: [...], distanceKm, pickup, destination }`.
+  Each ride: `id`, `vehicleLabel` (e.g. "Sedan"), `capacity`, `driverRating`,
+  `fare`, `etaMin`, `distanceKm`, `safetyScore`, `safetyLabel`, `ecoScore`,
+  `recommendationScore`, `reason`. `vehicleLabel` drives the vehicle color;
+  an unknown/missing one just shows a neutral dot (it won't crash).
+- `POST /api/rides/book` — request `{ ride_id }` (the `id` of the chosen
+  search result). Response `{ ride, driver }`:
+  - `ride`: any fields to update on the searched ride (e.g. a new `id`,
+    `status`); omitted fields keep their searched values.
+  - `driver` (required — without it the UI says no driver was assigned):
+    `name`, `rating`, `total_rides`, `verification_status`, `phone`, and
+    `vehicle: { model, vehicle_number, fuel_type, capacity }`.
+  - Before booking there is no driver, so Ride Details shows "Your driver
+    and vehicle are assigned as soon as you confirm" unless the search
+    results themselves include a `driver`.
 
 ## Still mock-only — needs a small restructure first, not just a flag flip
-
-- **`rideService.getDriverForRide(ride)`** (used by Ride Details): in the
-  real API there's no standalone "get driver for an unbooked ride"
-  endpoint — the driver comes back from `POST /api/rides/book` once the
-  rider actually confirms. Wiring this means moving driver assignment
-  from Ride Details' render (synchronous today) into the "Confirm Ride"
-  button's click handler (an async call), then passing the booked ride's
-  driver forward to Live Ride instead of looking it up again.
 
 - **`rideService.getAnomalyPlan(ride)`** (used by Live Ride): the real
   flow is `POST /api/ai/anomaly-detect` polled periodically during the

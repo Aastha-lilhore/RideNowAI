@@ -1,7 +1,7 @@
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { ShieldCheck, Leaf, BarChart3 } from 'lucide-react'
 import { getRideHistory } from '../services/rideService.js'
-import { VEHICLE_COLORS } from '../data/vehicleColors.js'
+import { colorsFor } from '../data/vehicleColors.js'
 
 /**
  * Insights tab (docs/REQUIREMENTS.md -> Insights): total spending,
@@ -174,7 +174,7 @@ function InsightsPage() {
               <span className="w-12 shrink-0 text-xs text-text-secondary">{v.label}</span>
               <div className="h-2 flex-1 overflow-hidden rounded-full bg-bg-card-alt">
                 <div
-                  className={`h-full rounded-full ${VEHICLE_COLORS[v.key].bar}`}
+                  className={`h-full rounded-full ${colorsFor(v.key).bar}`}
                   style={{ width: `${(v.count / maxVehicleCount) * 100}%` }}
                 />
               </div>

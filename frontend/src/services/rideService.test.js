@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { searchRides, getAnomalyPlan, getRouteCoordinates, getDriverForRide } from './rideService.js'
+import { searchRides, getAnomalyPlan, getRouteCoordinates, getDriverForRide, previewDriver, bookRide } from './rideService.js'
 
 // searchRides simulates network latency with setTimeout
 async function search(args) {
@@ -90,5 +90,60 @@ describe('getDriverForRide', () => {
     expect(driver.verification_status).toBe('verified')
     expect(driver.phone).toMatch(/^\+91 /)
     expect(driver.vehicle.vehicle_type).toBe('Sedan')
+  })
+})
+
+const SEARCHED_RIDE = { id: 'sedan', fare: 200, etaMin: 15, driverRating: 4.7, safetyScore: 90, vehicleLabel: 'Sedan', capacity: 4 }
+
+describe('bookRide (mock mode)', () => {
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
+
+  it('resolves the ride plus the same driver the preview showed', async () => {
+    const promise = bookRide(SEARCHED_RIDE)
+    await vi.advanceTimersByTimeAsync(1000)
+    const booked = await promise
+    expect(booked.ride).toEqual(SEARCHED_RIDE)
+    expect(booked.driver).toEqual(previewDriver(SEARCHED_RIDE))
+  })
+})
+
+describe('bookRide / previewDriver (real backend mode)', () => {
+  async function loadRealModeService(post) {
+    vi.resetModules()
+    vi.doMock('./apiClient.js', () => ({ USE_MOCKS: false, default: { post } }))
+    return import('./rideService.js')
+  }
+
+  afterEach(() => {
+    vi.doUnmock('./apiClient.js')
+    vi.resetModules()
+  })
+
+  it('posts the ride id to /api/rides/book and merges the booked ride over the searched one', async () => {
+    const driver = { name: 'Asha Verma', phone: '+91 90000 00000', vehicle: { model: 'Dzire' } }
+    const post = vi.fn().mockResolvedValue({ data: { ride: { id: 'ride-77', status: 'booked' }, driver } })
+    const real = await loadRealModeService(post)
+
+    const booked = await real.bookRide({ ...SEARCHED_RIDE, id: 'ride-77' })
+
+    expect(post).toHaveBeenCalledWith('/api/rides/book', { ride_id: 'ride-77' })
+    expect(booked.driver).toBe(driver)
+    expect(booked.ride).toMatchObject({ id: 'ride-77', status: 'booked', fare: 200, etaMin: 15 })
+  })
+
+  it('rejects with the { error } shape when the booking comes back without a driver', async () => {
+    const post = vi.fn().mockResolvedValue({ data: { ride: { id: 'ride-77' } } })
+    const real = await loadRealModeService(post)
+
+    await expect(real.bookRide({ ...SEARCHED_RIDE, id: 'ride-77' })).rejects.toEqual({
+      error: expect.stringContaining('no driver'),
+    })
+  })
+
+  it('previewDriver is null until a driver is assigned, and passes one through if the search carried it', async () => {
+    const real = await loadRealModeService(vi.fn())
+    expect(real.previewDriver(SEARCHED_RIDE)).toBeNull()
+    expect(real.previewDriver({ ...SEARCHED_RIDE, driver: { name: 'Asha Verma' } })).toEqual({ name: 'Asha Verma' })
   })
 })
