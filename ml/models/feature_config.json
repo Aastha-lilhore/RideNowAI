@@ -1,0 +1,83 @@
+{
+  "fare": {
+    "numeric": [
+      "distance_km",
+      "passenger_count",
+      "booking_hour",
+      "day_of_week",
+      "is_weekend",
+      "is_peak_hour",
+      "is_late_night",
+      "traffic_weather_risk",
+      "ride_request_count_15min",
+      "nearby_driver_count",
+      "demand_supply_ratio",
+      "estimated_arrival_min",
+      "pickup_wait_estimate",
+      "route_expected_km"
+    ],
+    "categorical": [
+      "pickup_zone",
+      "drop_zone",
+      "vehicle_type",
+      "traffic_level",
+      "weather",
+      "payment_method",
+      "booking_source"
+    ]
+  },
+  "safety": {
+    "numeric": [
+      "distance_km",
+      "passenger_count",
+      "booking_hour",
+      "day_of_week",
+      "is_weekend",
+      "is_peak_hour",
+      "is_late_night",
+      "traffic_weather_risk",
+      "ride_request_count_15min",
+      "nearby_driver_count",
+      "demand_supply_ratio",
+      "estimated_arrival_min",
+      "pickup_wait_estimate",
+      "driver_acceptance_rate",
+      "driver_cancellation_history",
+      "driver_profile_rating"
+    ],
+    "categorical": [
+      "pickup_zone",
+      "drop_zone",
+      "vehicle_type",
+      "traffic_level",
+      "weather",
+      "payment_method",
+      "booking_source"
+    ]
+  },
+  "route_anomaly": {
+    "numeric": [
+      "distance_km",
+      "passenger_count",
+      "booking_hour",
+      "day_of_week",
+      "traffic_weather_risk",
+      "route_expected_km",
+      "actual_route_km",
+      "trip_duration_min",
+      "unexpected_stop_count",
+      "gps_signal_gap_min",
+      "driver_speed_kmh_simulated",
+      "driver_gps_accuracy_m_simulated",
+      "estimated_arrival_min"
+    ],
+    "categorical": [
+      "pickup_zone",
+      "drop_zone",
+      "vehicle_type",
+      "traffic_level",
+      "weather",
+      "driver_location_status_simulated"
+    ]
+  }
+}
