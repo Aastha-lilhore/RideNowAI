@@ -282,15 +282,11 @@ export function getDriverForRide(ride) {
   }
 }
 
-<<<<<<< HEAD
-// Demo city center (Indore). Coordinates are mocked, not real geocoding.
-=======
+
 /**
  * The driver card shown on Ride Details BEFORE the user confirms.
  * Mock mode: a deterministic preview, same driver the booking returns.
- * Real mode: a driver is only assigned by POST /api/rides/book, so this is
- * whatever the search result carried (`ride.driver`), or null — the page
- * then tells the user the driver is assigned on confirmation.
+ * Real mode: a driver is only assigned by POST /api/rides/book.
  */
 export function previewDriver(ride) {
   if (!USE_MOCKS) return ride.driver || null
@@ -298,31 +294,58 @@ export function previewDriver(ride) {
 }
 
 /**
- * Confirm Ride (docs/API_CONTRACT.md -> POST /api/rides/book).
- * Resolves `{ ride, driver }` — the booked ride (merged over the search
- * result, so fields the backend omits keep their searched values) and the
- * driver assigned to it. The response shape is documented in
- * docs/BACKEND_INTEGRATION.md for the backend to confirm; the contract only
- * says "returns booked ride with driver assigned".
- * Rejects with `{ error }`, like every other service.
+ * Confirm Ride.
+ * Resolves { ride, driver } for a successful booking.
  */
-export function bookRide(ride) {
+
+/**
+ * Book a ride using the selected ride object or ride ID.
+ */
+export function bookRide(rideOrId) {
+  const ride =
+    typeof rideOrId === 'object' && rideOrId !== null
+      ? rideOrId
+      : null
+
+  const rideId = ride ? ride.id : rideOrId
+
   if (!USE_MOCKS) {
-    return apiClient.post('/api/rides/book', { ride_id: ride.id }).then((res) => {
-      const { ride: bookedRide, driver } = res.data
-      if (!driver) return Promise.reject({ error: 'Your ride was booked, but no driver was assigned yet.' })
-      return { ride: { ...ride, ...bookedRide }, driver }
-    })
+    return apiClient
+      .post('/api/rides/book', { ride_id: rideId })
+      .then((res) => {
+        const data = res.data
+        const bookedRide = data.ride || data
+        const driver = data.driver || bookedRide.driver
+
+        if (!driver) {
+          return Promise.reject({
+            error: 'Your ride was booked, but no driver was assigned yet.',
+          })
+        }
+
+        return {
+          ride: ride ? { ...ride, ...bookedRide } : bookedRide,
+          driver,
+        }
+      })
+  }
+
+  if (!ride) {
+    return Promise.reject(
+      new Error('Mock booking requires the selected ride object.')
+    )
   }
 
   return new Promise((resolve) => {
-    setTimeout(() => resolve({ ride, driver: getDriverForRide(ride) }), 600)
+    setTimeout(() => {
+      resolve({ ride, driver: getDriverForRide(ride) })
+    }, 600)
   })
 }
 
-// Demo city center (Indore) — no real geocoding backend yet, so pickup/
-// destination are mocked as small deterministic offsets from this point.
->>>>>>> 851cbe7c7a5046875d59ca50ee5610e597bdf561
+
+// Demo city center (Indore). Coordinates are mocked, not real geocoding.
+
 const CITY_CENTER = { lat: 22.7196, lng: 75.8577 }
 
 export function getRouteCoordinates(pickup, destination) {
@@ -348,21 +371,7 @@ export function getRouteCoordinates(pickup, destination) {
   }
 }
 
-/**
- * Book a ride through the backend.
- * The backend expects a ride ID such as SEARCH001.
- */
-export function bookRide(rideId) {
-  if (USE_MOCKS) {
-    return Promise.reject(
-      new Error('Booking requires the backend API. Set VITE_USE_MOCKS=false.')
-    )
-  }
 
-  return apiClient.post('/api/rides/book', {
-    ride_id: rideId,
-  }).then((res) => res.data)
-}
 
 /**
  * Demo ride history.

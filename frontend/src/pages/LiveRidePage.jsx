@@ -47,6 +47,7 @@ const vehicleIcon = L.divIcon({
   iconSize: [16, 16],
 })
 
+
 function lerp(a, b, t) {
   return a + (b - a) * t
 }
@@ -82,6 +83,46 @@ function LiveRidePage() {
     () => (pickup && destination ? getRouteCoordinates(pickup, destination) : null),
     [pickup, destination],
   )
+const [roadRoute, setRoadRoute] = useState([])
+useEffect(() => {
+  if (!coords) return
+
+  let cancelled = false
+
+  async function loadRoadRoute() {
+    try {
+      const { pickup, destination } = coords
+
+      const url =
+        `https://router.project-osrm.org/route/v1/driving/` +
+        `${pickup.lng},${pickup.lat};${destination.lng},${destination.lat}` +
+        `?overview=full&geometries=geojson`
+
+      const response = await fetch(url)
+      if (!response.ok) throw new Error('Route request failed')
+
+      const data = await response.json()
+      if (data.code !== 'Ok' || !data.routes?.length) {
+        throw new Error('No road route found')
+      }
+
+      if (!cancelled) {
+        setRoadRoute(
+          data.routes[0].geometry.coordinates.map(([lng, lat]) => [lat, lng]),
+        )
+      }
+    } catch (error) {
+      console.error('Could not load road route:', error)
+      if (!cancelled) setRoadRoute([])
+    }
+  }
+
+  loadRoadRoute()
+
+  return () => {
+    cancelled = true
+  }
+}, [coords])
 
   const [progress, setProgress] = useState(0)
   const [sosStage, setSosStage] = useState('idle')
@@ -121,10 +162,27 @@ function LiveRidePage() {
     )
   }
 
-  const vehiclePos = [
-    lerp(coords.pickup.lat, coords.destination.lat, progress),
-    lerp(coords.pickup.lng, coords.destination.lng, progress),
+
+const vehiclePos = useMemo(() => {
+  if (roadRoute.length < 2) {
+    return [
+      lerp(coords.pickup.lat, coords.destination.lat, progress),
+      lerp(coords.pickup.lng, coords.destination.lng, progress),
+    ]
+  }
+
+  const routeIndex = progress * (roadRoute.length - 1)
+  const index = Math.min(
+    Math.floor(routeIndex),
+    roadRoute.length - 2,
+  )
+  const fraction = routeIndex - index
+
+  return [
+    lerp(roadRoute[index][0], roadRoute[index + 1][0], fraction),
+    lerp(roadRoute[index][1], roadRoute[index + 1][1], fraction),
   ]
+}, [roadRoute, coords, progress])
 
   const remainingMin = Math.max(0, Math.round(ride.etaMin * (1 - progress)))
   const arrived = progress >= 1
@@ -191,18 +249,28 @@ function LiveRidePage() {
         >
           <FitMapToRoute coords={coords} />
 
-          <TileLayer
-  url={`https://basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png?key=${import.meta.env.VITE_CARTO_API_KEY}`}
-  attribution="&copy; OpenStreetMap contributors &copy; CARTO"
+          
+
+
+<TileLayer
+  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  attribution="&copy; OpenStreetMap contributors"
 />
 
+
+
+
           <Polyline
-            positions={[
-              [coords.pickup.lat, coords.pickup.lng],
-              [coords.destination.lat, coords.destination.lng],
-            ]}
-            pathOptions={{ color: '#d9822b', weight: 3, opacity: 0.8 }}
-          />
+  positions={
+    roadRoute.length > 0
+      ? roadRoute
+      : [
+          [coords.pickup.lat, coords.pickup.lng],
+          [coords.destination.lat, coords.destination.lng],
+        ]
+  }
+  pathOptions={{ color: '#d9822b', weight: 4, opacity: 0.9 }}
+/>
 
           <Marker
             position={[coords.pickup.lat, coords.pickup.lng]}
